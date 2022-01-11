@@ -113,11 +113,11 @@ int get(List L){ // Returns cursor element of L. Pre: length()>0, index()>=0
 
 bool equals(List A, List B){ // Returns true iff Lists A and B are in same
  // state, and returns false otherwise.
-	if(length(A) == NULL){
+	if(A == NULL){
 		fprintf(stderr, "List Error: calling equals() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
-	if(length(B) == NULL){
+	if(B == NULL){
 		fprintf(stderr, "List Error: calling equals() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
@@ -144,8 +144,8 @@ void set(List L, int x){ // Overwrites the cursor element’s data with x.
 		fprintf(stderr, "List Error: calling set() on an empty List\n");
 		exit(EXIT_FAILURE);
 	}
-	Node N = newNode(x);
-	L->cursor = N;
+	Node Nod = newNode(x);
+	L->cursor = Nod;
 }
 
 void moveFront(List L){ // If L is non-empty, sets cursor under the front element,
@@ -154,41 +154,107 @@ void moveFront(List L){ // If L is non-empty, sets cursor under the front elemen
 		fprintf(stderr, "List Error: calling moveFront() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
-	if(length(L) <= 0 || index(L) < 0){
-		
+	if(length(L) > 0){
+		L->cursor = L->front;
+		L->index = 0;
 	}
 }
 
 void moveBack(List L){ // If L is non-empty, sets cursor under the back element,
  // otherwise does nothing.
-
+	if(L == NULL){
+		fprintf(stderr, "List Error: calling moveBack() on NULL List reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(length(L) > 0){
+		L->cursor = L->back;
+		L->index = n-1;
+	}
 }		
 
 void movePrev(List L){ // If cursor is defined and not at front, move cursor one 
  // step toward the front of L; if cursor is defined and at 
  // front, cursor becomes undefined; if cursor is undefined 
  // do nothing
- 
+ 	if(L == NULL){
+		fprintf(stderr, "List Error: calling movePrev() on NULL List reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(L->cursor != NULL){
+		if(L->index != 0){
+		L->index--;
+		L->cursor = L->cursor->prev;
+		}	
+		else{
+		L->cursor = NULL;
+		}
+	}
 }
 	
-void moveNext(List L); // If cursor is defined and not at back, move cursor one 
+void moveNext(List L){ // If cursor is defined and not at back, move cursor one 
  // step toward the back of L; if cursor is defined and at 
  // back, cursor becomes undefined; if cursor is undefined 
  // do nothing
-3
-void prepend(List L, int x); // Insert new element into L. If L is non-empty, 
+	if(L == NULL){
+		fprintf(stderr, "List Error: calling moveNext() on NULL List reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(L->cursor != NULL){
+	       	if(L->index != n-1){
+			L->index++;
+			L->cursor = L->cursor->next;
+		}
+		else{
+			L->cursor == NULL;
+		}
+	}
+}
+
+void prepend(List L, int x){ // Insert new element into L. If L is non-empty, 
  // insertion takes place before front element.
-void append(List L, int x); // Insert new element into L. If L is non-empty, 
+	if(L == NULL){
+		fprintf(stderr, "List Error: calling prepend() on NULL List reference\n");
+		exit(EXIT_FAILURE);
+	}
+	Node Nod = newNode(x);
+	if(length(L) == 0){
+		L->front = L->back = Nod;
+	}else{
+		L->back->next = Nod;
+		L->back = N;
+	}
+	L->n++;
+}
+
+void append(List L, int x){ // Insert new element into L. If L is non-empty, 
  // insertion takes place after back element.
-void insertBefore(List L, int x); // Insert new element before cursor. 
+	
+}
+
+void insertBefore(List L, int x){ // Insert new element before cursor. 
  // Pre: length()>0, index()>=0
-void insertAfter(List L, int x); // Insert new element after cursor. 
+
+}
+
+void insertAfter(List L, int x){ // Insert new element after cursor. 
  // Pre: length()>0, index()>=0
-void deleteFront(List L); // Delete the front element. Pre: length()>0
-void deleteBack(List L); // Delete the back element. Pre: length()>0
-void delete(List L); // Delete cursor element, making cursor undefined.
+
+}	
+
+void deleteFront(List L){ // Delete the front element. Pre: length()>0
+
+}
+
+void deleteBack(List L){ // Delete the back element. Pre: length()>0
+
+}	
+	
+void delete(List L){ // Delete cursor element, making cursor undefined.
  // Pre: length()>0, index()>=0
 // Other operations -----------------------------------------------------------
+
+}	
+	
 void printList(FILE* out, List L); // Prints to the file pointed to by out, a 
  // string representation of L consisting 
  // of a space separated sequence of integers,
