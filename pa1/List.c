@@ -16,7 +16,7 @@ typedef struct ListObj{
 	Node back;
 	Node cursor;
 	int n;
-	int index;
+	int idx;
 } ListObj;
 
 typedef ListObj* List;
@@ -42,7 +42,7 @@ List newList(void){
 	L->front = NULL;
 	L->cursor = NULL;
 	L->n = 0;
-	L->index = 0;
+	L->idx = 0;
 	L->back = NULL;
 	return(L);
 }	// Creates and returns a new empty List.
@@ -72,7 +72,7 @@ int index(List L){ // Returns index of cursor element if defined, -1 otherwise.
 	if(L->cursor == NULL){
 		return -1;
 	}
-	return (L->index);
+	return (L->idx);
 }
 
 int front(List L){ // Returns front element of L. Pre: length()>0
@@ -131,13 +131,17 @@ bool equals(List A, List B){ // Returns true iff Lists A and B are in same
 
  // Manipulation procedures ----------------------------------------------------
 void clear(List L){ // Resets L to its original empty state.
-	
+	if(L == NULL){
+		fprintf(stderr, "List Error: calling clear() on NULL List reference\n");
+		exit(EXIT_FAILURE);
+	}	
+
 }
 
 void set(List L, int x){ // Overwrites the cursor element’s data with x. 
  // Pre: length()>0, index()>=0
 	if(L == NULL){
-		fpritnf(stderr, "List Error: calling set() on NULL List reference\n");
+		fprintf(stderr, "List Error: calling set() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
 	if(length(L) <= 0 || index(L) < 0){
@@ -156,7 +160,7 @@ void moveFront(List L){ // If L is non-empty, sets cursor under the front elemen
 	}
 	if(length(L) > 0){
 		L->cursor = L->front;
-		L->index = 0;
+		L->idx = 0;
 	}
 }
 
@@ -168,7 +172,7 @@ void moveBack(List L){ // If L is non-empty, sets cursor under the back element,
 	}
 	if(length(L) > 0){
 		L->cursor = L->back;
-		L->index = n-1;
+		L->idx = n-1;
 	}
 }		
 
@@ -181,12 +185,12 @@ void movePrev(List L){ // If cursor is defined and not at front, move cursor one
 		exit(EXIT_FAILURE);
 	}
 	if(L->cursor != NULL){
-		if(L->index != 0){
-		L->index--;
-		L->cursor = L->cursor->prev;
+		if(L->idx != 0){
+			L->idx--;
+			L->cursor = L->cursor->prev;
 		}	
 		else{
-		L->cursor = NULL;
+			L->cursor = NULL;
 		}
 	}
 }
@@ -200,8 +204,8 @@ void moveNext(List L){ // If cursor is defined and not at back, move cursor one
 		exit(EXIT_FAILURE);
 	}
 	if(L->cursor != NULL){
-	       	if(L->index != n-1){
-			L->index++;
+	       	if(L->idx != n-1){
+			L->idx++;
 			L->cursor = L->cursor->next;
 		}
 		else{
@@ -220,25 +224,68 @@ void prepend(List L, int x){ // Insert new element into L. If L is non-empty,
 	if(length(L) == 0){
 		L->front = L->back = Nod;
 	}else{
-		L->back->next = Nod;
-		L->back = N;
+		L->front->prev = Nod;
+		L->front = Nod;
+		L->idx++;
 	}
 	L->n++;
 }
 
 void append(List L, int x){ // Insert new element into L. If L is non-empty, 
  // insertion takes place after back element.
-	
+	if(L == NULL){
+		fprintf(stderr, "List Error: calling append() on NULL List reference\n");
+		exit(EXIT_FAILURE);
+	}
+	Node Nod = newNode(x);
+	if(length(L) == 0){
+		L->front = L->back = Nod;
+	}else{
+		L->back->next = Nod;
+		L->back = Nod;
+		L->idx++;
+	}
+	L->n++;
 }
 
 void insertBefore(List L, int x){ // Insert new element before cursor. 
  // Pre: length()>0, index()>=0
-
+	if(L == NULL){
+		fprintf(stderr, "List Error: calling insertBefore() on NULL List reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(length(L) <= 0 || index < 0){
+		fprintf(stderr, "List Error: calling insertBefore() on an empty List\n");
+		exit(EXIT_FAILURE);
+	}
+	if(index == 0){
+		
+	}
+	Node Nod = newNode(x);
+	L->idx++;
+	L->n++;
+	N->next= L->cursor;
+	N->prev = L->cursor->prev;
+	L->cursor->prev->next = Nod;
+	L->cursor->prev = Nod;
 }
 
 void insertAfter(List L, int x){ // Insert new element after cursor. 
  // Pre: length()>0, index()>=0
-
+	if(L == NULL){
+		fprintf(stderr, "List Error: calling insertAfter() on NULL List reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(length(L) <= 0 || index < 0){
+		fprintf(stderr, "List Error: calling insertAfter() on NULL List reference\n");
+		exit(EXIT_FAILURE);
+	}
+	Node Nod = newNode(x);
+	L->n++;
+	Nod->next = L->cursor->next;
+	Nod->prev = L->cursor;
+	L->cursor->next->prev = Nod;
+	L->cursor->next = Nod;
 }	
 
 void deleteFront(List L){ // Delete the front element. Pre: length()>0
