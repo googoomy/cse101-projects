@@ -136,12 +136,27 @@ void clear(List L){ // Resets L to its original empty state.
 
 void set(List L, int x){ // Overwrites the cursor element’s data with x. 
  // Pre: length()>0, index()>=0
-
+	if(L == NULL){
+		fpritnf(stderr, "List Error: calling set() on NULL List reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(length(L) <= 0 || index(L) < 0){
+		fprintf(stderr, "List Error: calling set() on an empty List\n");
+		exit(EXIT_FAILURE);
+	}
+	Node N = newNode(x);
+	L->cursor = N;
 }
 
 void moveFront(List L){ // If L is non-empty, sets cursor under the front element,
  // otherwise does nothing.
-
+	if(L == NULL){
+		fprintf(stderr, "List Error: calling moveFront() on NULL List reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(length(L) <= 0 || index(L) < 0){
+		
+	}
 }
 
 void moveBack(List L){ // If L is non-empty, sets cursor under the back element,
