@@ -22,7 +22,7 @@ int main(int argc, char * argv[]){
 		exit(EXIT_FAILURE);
 	}
 
-	out = fopen(arg[2], "w");
+	out = fopen(argv[2], "w");
 	if(out == NULL){
 		fprintf(stderr, "Unable to open file %s for writing\n", argv[2]);
 		exit(EXIT_FAILURE);
@@ -45,7 +45,7 @@ int main(int argc, char * argv[]){
 	while(fgets(line, MAX_LEN, in) != NULL){
 		char * str;
 		fscanf(in, "%s", str);
-		char *str[count];
+		arr[count] = str;
 		count++;
 	}
 	//create the list of integers
