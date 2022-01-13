@@ -1,3 +1,4 @@
+#include "List.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -41,13 +42,38 @@ int main(int argc, char * argv[]){
 	fseek(in, 0, SEEK_SET);
 	//make the string array using malloc
 	char *arr = (char *)malloc(n * (sizeof(char)));
+	char *curr_str;
 	//add each line to the infile, line by line
 	while(fgets(line, MAX_LEN, in) != NULL){
-		char * str;
-		fscanf(in, "%s", str);
-		arr[count] = str;
+		line[strlen(line)-1] = '\0';
+		curr_str = (char *) malloc(strlen(line));
+		strcpy(curr_str, line);
+		arr[count] = curr_str;
 		count++;
 	}
+	List L = newList();
+	int curr_ele;
+	for(int i = 0; i < count; i++){
+		if(i == 0){
+			append(L, 0);
+		}else{
+			moveFront(L);
+			for(int j = 0; j < length(L); j++){
+				curr_ele = get(L);
+				if(strcmp(arr[i], arr[curr_ele] <= 0)){
+					prepend(L, i);
+					break;
+				}
+				if(j == length(L)-1){
+					append(L, i);
+					break;
+				}
+				moveNext(L);
+			}
+		}
+	}
+
+	/*
 	//create the list of integers
 	int list[n];
 	//add numbers 0-n to the list
@@ -65,16 +91,19 @@ int main(int argc, char * argv[]){
 		}
 		list[j] = i;
 	}
+	*/
+
 	
 	//print the array in alphabetical order to the output file
-	for(int i = 0; i < n; i++){
-		fprintf(out, "%s\n", arr[list[i]]); 
-	}
+	printList(out, L);
 
 	//close files
 	fclose(in);
 	fclose(out);
 	//free the string array
+	for(int i = 0; i < count; i++){
+		free(arr[i]);
+	}
 	free(arr);
 	return(0);
 }

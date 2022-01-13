@@ -1,3 +1,4 @@
+#include "List.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -124,9 +125,20 @@ bool equals(List A, List B){ // Returns true iff Lists A and B are in same
 	if(length(A) != length(B) || front(A) != front(B) || back(A) != front(B)){
 		return false;
 	}
+	moveFront(A);
+	moveFront(B);
+	bool isEqual = true;
 	for(int i = 0; i < length(A); i++){
-		
+		int curr_eleA = get(A);
+		int curr_eleB = get(B);
+		if(curr_eleA != curr_eleB){
+			isEqual = false;
+			break;
+		}
+		moveNext(A);
+		moveNext(B);
 	}
+	return isEqual;
 }
 
  // Manipulation procedures ----------------------------------------------------
@@ -344,11 +356,32 @@ void delete(List L){ // Delete cursor element, making cursor undefined.
 	
 // Other operations -----------------------------------------------------------
 
-void printList(FILE* out, List L); // Prints to the file pointed to by out, a 
+void printList(FILE* out, List L){ // Prints to the file pointed to by out, a 
  // string representation of L consisting 
  // of a space separated sequence of integers,
 // with front on left.
-List copyList(List L); // Returns a new List representing the same integer 
+	if(L == NULL){
+		fprintf(stderr, "List Error calling printList() on NULL List reference\n");
+		exit(EXIT_FAILURE);
+	}
+	Node Nod = NULL;
+	for(Nod = L->front; Nod != NULL; Nod = Nod->next){
+		fprintf(out, "%d\n", Nod->data);
+	}
+}
+
+List copyList(List L){ // Returns a new List representing the same integer 
  // sequence as L. The cursor in the new list is undefined,
 // regardless of the state of the cursor in L. The state 
 // of L is unchanged.
+	if(L == NULL){
+		fprintf(stderr, "List Error calling copyList() on NULL List reference\n");
+		exit(EXIT_FAILURE);
+	}
+	Node Nod = NULL;
+	List R = newList();
+	for(Nod = L->front; Nod != NULL; Nod = Nod->next){
+		append(R, Nod->data);
+	}
+	return R;
+}
