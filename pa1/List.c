@@ -269,7 +269,7 @@ void insertBefore(List L, int x){ // Insert new element before cursor.
 		fprintf(stderr, "List Error: calling insertBefore() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
-	if(length(L) <= 0 || index < 0){
+	if(length(L) <= 0 || L->idx < 0){
 		fprintf(stderr, "List Error: calling insertBefore() on an empty List\n");
 		exit(EXIT_FAILURE);
 	}
@@ -292,7 +292,7 @@ void insertAfter(List L, int x){ // Insert new element after cursor.
 		fprintf(stderr, "List Error: calling insertAfter() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
-	if(length(L) <= 0 || index < 0){
+	if(length(L) <= 0 || L->idx < 0){
 		fprintf(stderr, "List Error: calling insertAfter() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
