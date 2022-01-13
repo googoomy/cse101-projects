@@ -41,7 +41,12 @@ int main(int argc, char * argv[]){
 	//reset the pointer in the infile to the start
 	fseek(in, 0, SEEK_SET);
 	//make the string array using malloc
-	char *arr = (char *)malloc(n * (sizeof(char)));
+	
+	char **arr;
+	arr = malloc(n * (sizeof(char*)));
+	
+	//char* arr[n];
+	
 	/*
 	char *curr_str;
 	//add each line to the infile, line by line
@@ -53,9 +58,15 @@ int main(int argc, char * argv[]){
 		count++;
 	}
 	*/
+	/*
 	while(!feof(in)){
-		fgets(&arr[count], MAX_LEN, in);
+		fgets(arr[count], MAX_LEN, in);
 		count++;	
+	}
+	*/
+	for(int i = 0; i < n; i++){
+		arr[i] = malloc(sizeof(char)*MAX_LEN);
+		fgets(arr[i], MAX_LEN, in);	
 	}
 
 	List L = newList();
@@ -67,8 +78,8 @@ int main(int argc, char * argv[]){
 			moveFront(L);
 			for(int j = 0; j < length(L); j++){
 				curr_ele = get(L);
-				if((strcmp(&arr[i], &arr[curr_ele]) <= 0)){
-					prepend(L, i);
+				if((strcmp(arr[i], arr[curr_ele]) <= 0)){
+					insertBefore(L, i);
 					break;
 				}
 				if(j == length(L)-1){
@@ -108,11 +119,11 @@ int main(int argc, char * argv[]){
 	fclose(in);
 	fclose(out);
 	//free the string array
-	/*
+	
 	for(int i = 0; i < count; i++){
-		free(&arr[i]);
+		free(arr[i]);
 	}
-	*/
+	
 	free(arr);	
 	freeList(&L);
 	return(0);
