@@ -51,6 +51,9 @@ List newList(void){
 void freeList(List* pL){ // Frees all heap memory associated with *pL, and sets
 	// *pL to NULL.
 	if(pL != NULL && * pL != NULL){
+		while(length(*pL) > 0){
+			deleteFront(*pL);
+		}
 		free(*pL);
 		*pL = NULL;
 	}
@@ -85,19 +88,19 @@ int front(List L){ // Returns front element of L. Pre: length()>0
 		fprintf(stderr, "List Error: calling front() on an empty List\n");
 		exit(EXIT_FAILURE);
 	}
-	return (L->front);
+	return (L->front->data);
 }
 
 int back(List L){ // Returns back element of L. Pre: length()>0
 	if(L == NULL){
 		fprintf(stderr, "List Error: calling back() on NULL List reference\n");
-	       exit(EXIT_FAILURE);	
+		exit(EXIT_FAILURE);	
 	}
 	if(length(L) <= 0){
 		fprintf(stderr, "List Error: calling back() on an empty List\n");
 		exit(EXIT_FAILURE);
 	}
-	return (L->back);
+	return (L->back->data);
 }
 
 int get(List L){ // Returns cursor element of L. Pre: length()>0, index()>=0
@@ -109,7 +112,7 @@ int get(List L){ // Returns cursor element of L. Pre: length()>0, index()>=0
 		fprintf(stderr, "List Error: calling get() on an empty List\n");
 		exit(EXIT_FAILURE); 
 	}
-	return (L->cursor);
+	return (L->cursor->data);
 }
 
 bool equals(List A, List B){ // Returns true iff Lists A and B are in same
@@ -150,7 +153,7 @@ void clear(List L){ // Resets L to its original empty state.
 	while(length(L) > 0){
 		deleteFront(L);
 	}
-	L = newList();
+	L->idx = -1;
 }
 
 void set(List L, int x){ // Overwrites the cursor element’s data with x. 
@@ -187,7 +190,7 @@ void moveBack(List L){ // If L is non-empty, sets cursor under the back element,
 	}
 	if(length(L) > 0){
 		L->cursor = L->back;
-		L->idx = n-1;
+		L->idx = (L->n)-1;
 	}
 }		
 
@@ -219,12 +222,12 @@ void moveNext(List L){ // If cursor is defined and not at back, move cursor one
 		exit(EXIT_FAILURE);
 	}
 	if(L->cursor != NULL){
-	       	if(L->idx != n-1){
+	       	if(L->idx != (L->n)-1){
 			L->idx++;
 			L->cursor = L->cursor->next;
 		}
 		else{
-			L->cursor == NULL;
+			L->cursor = NULL;
 		}
 	}
 }
@@ -274,17 +277,13 @@ void insertBefore(List L, int x){ // Insert new element before cursor.
 		fprintf(stderr, "List Error: calling insertBefore() on an empty List\n");
 		exit(EXIT_FAILURE);
 	}
-	if(index == 0){
-		prepend(L, x);
-	}else{
-		Node Nod = newNode(x);
-		L->idx++;
-		L->n++;
-		N->next= L->cursor;
-		N->prev = L->cursor->prev;
-		L->cursor->prev->next = Nod;
-		L->cursor->prev = Nod;
-	}
+	Node Nod = newNode(x);
+	L->idx++;
+	L->n++;
+	Nod->next= L->cursor;
+	Nod->prev = L->cursor->prev;
+	L->cursor->prev->next = Nod;
+	L->cursor->prev = Nod;
 }
 
 void insertAfter(List L, int x){ // Insert new element after cursor. 
@@ -297,16 +296,12 @@ void insertAfter(List L, int x){ // Insert new element after cursor.
 		fprintf(stderr, "List Error: calling insertAfter() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
-	if(index == 0){
-		append(L, x);
-	}else{
-		Node Nod = newNode(x);
-		L->n++;
-		Nod->next = L->cursor->next;
-		Nod->prev = L->cursor;
-		L->cursor->next->prev = Nod;
-		L->cursor->next = Nod;
-	}
+	Node Nod = newNode(x);
+	L->n++;
+	Nod->next = L->cursor->next;
+	Nod->prev = L->cursor;
+	L->cursor->next->prev = Nod;
+	L->cursor->next = Nod;
 }
 
 void deleteFront(List L){ // Delete the front element. Pre: length()>0
@@ -319,7 +314,7 @@ void deleteFront(List L){ // Delete the front element. Pre: length()>0
 		exit(EXIT_FAILURE);
 	}
 	L->front = L->front->next;
-	freeNode(L->front->prev);
+	freeNode(&(L->front->prev));
 	L->idx--;
 	L->n--;
 }
@@ -334,7 +329,7 @@ void deleteBack(List L){ // Delete the back element. Pre: length()>0
 		exit(EXIT_FAILURE);
 	}
 	L->back = L->back->prev;
-	freeNode(L->back->next);
+	freeNode(&(L->back->next));
 	L->n--;
 }	
 	
@@ -350,7 +345,7 @@ void delete(List L){ // Delete cursor element, making cursor undefined.
 	}
 	L->cursor->prev->next = L->cursor->next;
 	L->cursor->next->prev = L->cursor->prev;
-	freeNode(L->cursor);
+	freeNode(&(L->cursor));
 	L->n--;
 }	
 	

@@ -42,15 +42,22 @@ int main(int argc, char * argv[]){
 	fseek(in, 0, SEEK_SET);
 	//make the string array using malloc
 	char *arr = (char *)malloc(n * (sizeof(char)));
+	/*
 	char *curr_str;
 	//add each line to the infile, line by line
 	while(fgets(line, MAX_LEN, in) != NULL){
 		line[strlen(line)-1] = '\0';
-		curr_str = (char *) malloc(strlen(line));
-		strcpy(curr_str, line);
-		arr[count] = curr_str;
+		//strcpy(curr_str, line);
+		curr_str = line;
+		arr[count] = *curr_str;
 		count++;
 	}
+	*/
+	while(!feof(in)){
+		fgets(&arr[count], MAX_LEN, in);
+		count++;	
+	}
+
 	List L = newList();
 	int curr_ele;
 	for(int i = 0; i < count; i++){
@@ -60,7 +67,7 @@ int main(int argc, char * argv[]){
 			moveFront(L);
 			for(int j = 0; j < length(L); j++){
 				curr_ele = get(L);
-				if(strcmp(arr[i], arr[curr_ele] <= 0)){
+				if((strcmp(&arr[i], &arr[curr_ele]) <= 0)){
 					prepend(L, i);
 					break;
 				}
@@ -101,9 +108,12 @@ int main(int argc, char * argv[]){
 	fclose(in);
 	fclose(out);
 	//free the string array
+	/*
 	for(int i = 0; i < count; i++){
-		free(arr[i]);
+		free(&arr[i]);
 	}
-	free(arr);
+	*/
+	free(arr);	
+	freeList(&L);
 	return(0);
 }
