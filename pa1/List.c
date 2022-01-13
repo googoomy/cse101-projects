@@ -41,7 +41,7 @@ List newList(void){
 	L->front = NULL;
 	L->cursor = NULL;
 	L->n = 0;
-	L->idx = 0;
+	L->idx = -1;
 	L->back = NULL;
 	return(L);
 }	// Creates and returns a new empty List.
@@ -49,7 +49,6 @@ List newList(void){
 void freeList(List* pL){ // Frees all heap memory associated with *pL, and sets
 	// *pL to NULL.
 	if(pL != NULL && * pL != NULL){
-		clear(*pL);
 		free(*pL);
 		*pL = NULL;
 	}
@@ -140,13 +139,17 @@ bool equals(List A, List B){ // Returns true iff Lists A and B are in same
 
  // Manipulation procedures ----------------------------------------------------
 void clear(List L){ // Resets L to its original empty state.
-	if(L == NULL){
-		fprintf(stderr, "List Error: calling clear() on NULL List reference\n");
-		exit(EXIT_FAILURE);
-	}	
+	
 	while(length(L) > 0){
 		deleteFront(L);
 	}
+	
+	/*
+	Node Nod = L->front;
+	while(true){
+		
+	}
+	*/
 	L->idx = -1;
 }
 
@@ -161,7 +164,31 @@ void set(List L, int x){ // Overwrites the cursor element’s data with x.
 		exit(EXIT_FAILURE);
 	}
 	Node Nod = newNode(x);
-	L->cursor = Nod;
+	if(L->idx == 0){
+		Nod->next = L->front->next;
+		L->front->next->prev = Nod;
+		freeNode(&L->front);
+		L->front = Nod;
+		L->cursor = Nod;
+	}else if(L->idx == (L->n)-1){
+		Nod->prev = L->back->prev;
+		L->back->prev->next = Nod;
+		freeNode(&L->back);
+		L->back = Nod;
+		L->cursor = Nod;
+	}else if(length(L) == 1){
+		L->idx = 0;
+		freeNode(&L->front);
+		L->front = L->back = Nod;
+		L->cursor = Nod;
+	}else{
+		L->cursor->next->prev = Nod;
+		L->cursor->prev->next = Nod;
+		Nod->next = L->cursor->next;
+		Nod->prev = L->cursor->prev;
+		freeNode(&L->cursor);
+		L->cursor = Nod;
+	}
 }
 
 void moveFront(List L){ // If L is non-empty, sets cursor under the front element,
@@ -241,7 +268,9 @@ void prepend(List L, int x){ // Insert new element into L. If L is non-empty,
 		Nod->next = L->front;
 		L->front->prev = Nod;
 		L->front = Nod;
-		L->idx++;
+		if(L->idx != -1){
+			L->idx++;
+		}
 	}
 	L->n++;
 }
@@ -256,8 +285,9 @@ void append(List L, int x){ // Insert new element into L. If L is non-empty,
 	if(length(L) == 0){
 		L->front = L->back = Nod;
 	}else{
-		Nod->prev = L->back;
+		//Nod->prev = L->back;
 		L->back->next = Nod;
+		Nod->prev = L->back;
 		L->back = Nod;
 	}
 	L->n++;
