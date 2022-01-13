@@ -121,7 +121,7 @@ bool equals(List A, List B){ // Returns true iff Lists A and B are in same
 		fprintf(stderr, "List Error: calling equals() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
-	if(length(A) != length(B) || front(A) != front(B) || back(A) != front(B)){
+	if(length(A) != length(B) || front(A) != front(B) || back(A) != back(B)){
 		return false;
 	}
 	Node NodA = A->front;
@@ -322,11 +322,16 @@ void deleteFront(List L){ // Delete the front element. Pre: length()>0
 			L->cursor = NULL;
 		}
 	}
-	Node Nod = L->front;
-	L->front->next->prev = NULL;
-	L->front = L->front->next;
-	freeNode(&Nod);
+	if(length(L) == 1){
+		freeNode(&L->front);
+	}else{
+		Node Nod = L->front;
+		L->front->next->prev = NULL;
+		L->front = L->front->next;
+		freeNode(&Nod);
+	}
 	L->n--;
+	
 }
 
 void deleteBack(List L){ // Delete the back element. Pre: length()>0
@@ -338,10 +343,15 @@ void deleteBack(List L){ // Delete the back element. Pre: length()>0
 		fprintf(stderr, "List Error: calling deleteBack() on an empty List\n");
 		exit(EXIT_FAILURE);
 	}
-	Node Nod = L->back;
-	L->back = L->back->prev;
-	freeNode(&Nod);
-	L->n--;
+	if(length(L) == 1){
+		//freeNode(&L->front);
+		freeNode(&L->back);
+	}else{
+		Node Nod = L->back;
+		L->back = L->back->prev;
+		freeNode(&Nod);
+		L->n--;
+	}
 }	
 	
 void delete(List L){ // Delete cursor element, making cursor undefined.
@@ -374,7 +384,7 @@ void printList(FILE* out, List L){ // Prints to the file pointed to by out, a
 	}
 	Node Nod = NULL;
 	for(Nod = L->front; Nod != NULL; Nod = Nod->next){
-		fprintf(out, "%d\n", Nod->data);
+		fprintf(out, "%d ", Nod->data);
 	}
 }
 

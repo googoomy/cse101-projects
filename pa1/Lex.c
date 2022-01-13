@@ -71,7 +71,7 @@ int main(int argc, char * argv[]){
 
 	List L = newList();
 	int curr_ele;
-	for(int i = 0; i < count; i++){
+	for(int i = 0; i < n; i++){
 		if(i == 0){
 			append(L, 0);
 		}else{
@@ -113,8 +113,16 @@ int main(int argc, char * argv[]){
 
 	
 	//print the array in alphabetical order to the output file
-	printList(out, L);
-
+	//fprintf(out, "hi");
+	//printList(out, L);
+	
+	moveFront(L);
+	
+	for(int i = 0; i < n; i++){
+		fprintf(out, "%d\n", get(L));
+		moveNext(L);
+	}
+	
 	//close files
 	fclose(in);
 	fclose(out);
