@@ -354,6 +354,29 @@ void deleteFront(List L){ // Delete the front element. Pre: length()>0
 		fprintf(stderr, "List Error: calling deleteFront() on an empty List\n");
 		exit(EXIT_FAILURE);
 	}
+	
+	if(L->cursor == L->front){
+		L->cursor = NULL;
+		L->idx = -1;
+	}
+	if(length(L) == 1){
+		freeNode(&L->front);
+		L->front = L->back = NULL;
+		L->idx = -1;
+		L->cursor = NULL;
+	}else{
+		Node Nod = L->front;
+		L->front->next->prev = NULL;
+		L->front = L->front->next;
+		freeNode(&Nod);
+		if(L->idx > -1){
+			L->idx--;
+		}
+	}
+
+	L->n--;
+	
+/*	
 	if(L->front == NULL){
 		return;
 	}
@@ -372,8 +395,8 @@ void deleteFront(List L){ // Delete the front element. Pre: length()>0
 		L->front = Nod;
 		L->n--;
 	}
-	
-	/*
+*/	
+/*	
 	if(L->idx != -1){
 		L->idx--;
 		if(L->idx <= -1){
@@ -389,7 +412,7 @@ void deleteFront(List L){ // Delete the front element. Pre: length()>0
 		freeNode(&Nod);
 	}
 	L->n--;
-	*/
+*/	
 
 }
 
