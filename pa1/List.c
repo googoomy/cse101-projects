@@ -1,3 +1,11 @@
+/********************************************
+ * James Gu
+ * jjgu
+ * pa1
+ *
+ *
+ * 
+ *******************************************/
 #include "List.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -22,6 +30,7 @@ typedef struct ListObj{
 } ListObj;
 
 // Constructors-Destructors ---------------------------------------------------
+//This function creates a new Node
 Node newNode(int node_data){
 	Node N = malloc(sizeof(NodeObj));
 	N->data = node_data;
@@ -30,6 +39,7 @@ Node newNode(int node_data){
 	return(N);
 }
 
+//This function deconstructs the Node
 void freeNode(Node* pN){
 	if(pN != NULL && *pN != NULL){
 		free(*pN);
@@ -37,6 +47,7 @@ void freeNode(Node* pN){
 	}
 }
 
+//This function is the consrtuctor for the List ADT
 List newList(void){
 	List L = malloc(sizeof(ListObj));
 	L->front = NULL;
@@ -122,12 +133,15 @@ bool equals(List A, List B){ // Returns true iff Lists A and B are in same
 		fprintf(stderr, "List Error: calling equals() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
+	//if the lists are both 0 then they are equal
 	if(length(A) == 0 && length(B) == 0){
 		return true;
 	}
+	//if the length, front, or the backs are different then theya re not equal
 	if(length(A) != length(B) || front(A) != front(B) || back(A) != back(B)){
 		return false;
 	}
+	//loop through each list and check if all elements in between front and back are equal
 	Node NodA = A->front;
 	Node NodB = B->front;
 	bool isEqual = true;
@@ -144,26 +158,23 @@ bool equals(List A, List B){ // Returns true iff Lists A and B are in same
 
  // Manipulation procedures ----------------------------------------------------
 void clear(List L){ // Resets L to its original empty state.
-/*	
-	while(length(L) > 0){
-		deleteFront(L);
-	}
-*/	
-	
-	if(L->front != NULL){		
+	//loop through the List and free each Node
+	if(L->front != NULL){
+		//Nod is the Node that will be deleted and is also the iteration variable in a way
 		Node Nod = L->front;
 		while(Nod != NULL){
+			//temporarily store the next Node
 			Node NodTemp = Nod->next;
 			if(Nod != NULL){
 				freeNode(&Nod);
 			}
-			Nod = NodTemp;	
+			//make the iteration Node the next Node in line
+			Nod = NodTemp;
 		}
 	}
+	//memset to reset the List to 0
+	//if I don't have this line I segfault
 	memset(L, 0, sizeof(ListObj));
-	//L->n = 0;
-	
-
 	L->idx = -1;
 }
 
@@ -178,24 +189,41 @@ void set(List L, int x){ // Overwrites the cursor element’s data with x.
 		exit(EXIT_FAILURE);
 	}
 	Node Nod = newNode(x);
+	//in case if the cursor is at the front
 	if(L->idx == 0){
+		//set the new Node's next to the current front's next, 
+		//set the next Node from the current front's previous to the new Node,
+		//free the current front,
+		//and set cursor to the New Node
 		Nod->next = L->front->next;
 		L->front->next->prev = Nod;
 		freeNode(&L->front);
 		L->front = Nod;
 		L->cursor = Nod;
+	//in case if the cursor is at the back
 	}else if(L->idx == (L->n)-1){
+		//set the new Node's previous to the current back's previous,
+		//set the prevous Node from the current back's next to the new Node,
+		//free the current back,
+		//and set the cursor to the new Node
 		Nod->prev = L->back->prev;
 		L->back->prev->next = Nod;
 		freeNode(&L->back);
 		L->back = Nod;
 		L->cursor = Nod;
+	//in case if the List is only one element long
 	}else if(length(L) == 1){
 		L->idx = 0;
 		freeNode(&L->front);
 		L->front = L->back = Nod;
 		L->cursor = Nod;
+	//in case if the cursor is somewhere in between front and back
 	}else{
+		//set the node at the cursor's next's, previous to the new Node
+		//set the node at the cursor's previous's next to the new Node
+		//set the new Node's next to the current cursor's Node's next
+		//set the new Node's prev to the current cursor's Node's prev
+		//free the cursor Node and set the cursor to the new Node
 		L->cursor->next->prev = Nod;
 		L->cursor->prev->next = Nod;
 		Nod->next = L->cursor->next;
@@ -212,6 +240,7 @@ void moveFront(List L){ // If L is non-empty, sets cursor under the front elemen
 		exit(EXIT_FAILURE);
 	}
 	if(length(L) > 0){
+		//set the cursor to the front and index to 0
 		L->cursor = L->front;
 		L->idx = 0;
 	}
@@ -224,6 +253,7 @@ void moveBack(List L){ // If L is non-empty, sets cursor under the back element,
 		exit(EXIT_FAILURE);
 	}
 	if(length(L) > 0){
+		//set the cursor to the back and index to n-1
 		L->cursor = L->back;
 		L->idx = (L->n)-1;
 	}
@@ -242,6 +272,7 @@ void movePrev(List L){ // If cursor is defined and not at front, move cursor one
 			L->idx--;
 			L->cursor = L->cursor->prev;
 		}	
+		//if the List is length 1
 		else{
 			L->cursor = NULL;
 			L->idx = -1;
@@ -262,6 +293,7 @@ void moveNext(List L){ // If cursor is defined and not at back, move cursor one
 			L->idx++;
 			L->cursor = L->cursor->next;
 		}
+		//if the List is length 1
 		else{
 			L->cursor = NULL;
 			L->idx = -1;
@@ -271,16 +303,15 @@ void moveNext(List L){ // If cursor is defined and not at back, move cursor one
 
 void prepend(List L, int x){ // Insert new element into L. If L is non-empty, 
  // insertion takes place before front element.
-	/*
-	if(L == NULL){
-		fprintf(stderr, "List Error: calling prepend() on NULL List reference\n");
-		exit(EXIT_FAILURE);
-	}
-	*/
 	Node Nod = newNode(x);
+	//if the List is empty then the front and back are the same
 	if(length(L) == 0){
 		L->front = L->back = Nod;
-	}else{
+	}else{ //if the length of the list is more than 0
+		//Set the new node's next to the front
+		//set the current front's previous to the new node
+		//set the front to the new Node
+		//increase the cursor's index by 1
 		Nod->next = L->front;
 		L->front->prev = Nod;
 		L->front = Nod;
@@ -293,17 +324,13 @@ void prepend(List L, int x){ // Insert new element into L. If L is non-empty,
 
 void append(List L, int x){ // Insert new element into L. If L is non-empty, 
  // insertion takes place after back element.
-	/*
-	if(L == NULL){
-		fprintf(stderr, "List Error: calling append() on NULL List reference\n");
-		exit(EXIT_FAILURE);
-	}
-	*/
 	Node Nod = newNode(x);
 	if(length(L) == 0){
 		L->front = L->back = Nod;
 	}else{
-		//Nod->prev = L->back;
+		//set the current back's next to the new Node,
+		//set the new Node's previous to the current back
+		//make the new back the new node
 		L->back->next = Nod;
 		Nod->prev = L->back;
 		L->back = Nod;
@@ -324,6 +351,9 @@ void insertBefore(List L, int x){ // Insert new element before cursor.
 	if(L->idx == 0){
 		prepend(L, x);
 	}else{
+		//to insert before, make sure the new Node's next connects to the cursor and prev connect to the cursor's prev
+		//then make sure the those nodes point to the new node instead of each other
+		//the index increases in insertBefore() because the cursor gets pushed up a position in the list
 		Node Nod = newNode(x);
 		L->idx++;
 		L->n++;
@@ -347,6 +377,8 @@ void insertAfter(List L, int x){ // Insert new element after cursor.
 	if(L->idx >= L->n - 1){
 		append(L, x);
 	}else{
+		//to insert after, the new Node's prev becomes the cursor and the next becomes the cursor's next
+		//those nodes point to the new node instead of each other
 		Node Nod = newNode(x);
 		L->n++;
 		Nod->next = L->cursor->next;
@@ -363,51 +395,28 @@ void deleteFront(List L){ // Delete the front element. Pre: length()>0
 		fprintf(stderr, "List Error: calling deleteFront() on an empty List\n");
 		exit(EXIT_FAILURE);
 	}
-/*	
-	if(L->cursor == L->front){
-		L->cursor = NULL;
-		L->idx = -1;
-	}
-	if(length(L) == 1){
-		freeNode(&L->front);
-		L->front = L->back = NULL;
-		L->idx = -1;
-		L->cursor = NULL;
-	}else{
-		Node Nod = L->front;
-		L->front->next->prev = NULL;
-		L->front = L->front->next;
-		freeNode(&Nod);
-		if(L->idx > -1){
-			L->idx--;
-		}
-	}
-
-	L->n--;
-*/	
 	
 	if(L->front == NULL){
 		return;
 	}
+	//if the cursor is at the front then it becomes null after front is deleted
 	if(L->cursor == L->front){
 		L->cursor = NULL;
 		L->idx = -1;
 	}
+	//if the length of the list is 1
 	if(length(L) == 1){
+		//free the only node in the list
 		freeNode(&L->front);
 		L->front = NULL;
 		L->back = NULL;
 		L->n = 0;
+	//if the length of the list is greater than 1
 	}else{
-		/*
-		L->idx--;
-		//Node Nod = L->front->next;
-		L->front->next->prev = NULL;
-		Node Nod = L->front->next;
-		freeNode(&L->front);
-		L->front = Nod;
-		L->n--;
-		*/
+		//set a temp Node to the current front
+		//set the front to the next node in line
+		//and set this new node's previous to null because we are going to delete the old front
+		//free the old fornt
 		Node Nod = L->front;
 		L->front = L->front->next;
 		L->front->prev = NULL;
@@ -418,24 +427,6 @@ void deleteFront(List L){ // Delete the front element. Pre: length()>0
 		}
 		L->n--;
 	}
-	
-/*	if(L->idx != -1){
-		L->idx--;
-		if(L->idx <= -1){
-			L->cursor = NULL;
-		}
-	}
-	if(length(L) == 1){
-		freeNode(&L->front);
-	}else{
-		Node Nod = L->front;
-		L->front->next->prev = NULL;
-		L->front = L->front->next;
-		freeNode(&Nod);
-	}
-	L->n--;
-*/	
-
 }
 
 void deleteBack(List L){ // Delete the back element. Pre: length()>0
@@ -450,32 +441,27 @@ void deleteBack(List L){ // Delete the back element. Pre: length()>0
 	if(L->back == NULL){
 		return;
 	}
+	//if he cursor is at the back then it becomes null after back is deleted
 	if(L->cursor == L->back){
 		L->cursor = NULL;
 		L->idx = -1;
 	}
+	//if the length of the list is 1
 	if(length(L) == 1){
+		//free the only node in the list
 		freeNode(&L->back);
 		L->n = 0;
 	}else{
+		//set the temp Node to the back's previous
+		//set the back's previous's next to NULL
+		//free the current back
+		//set the new node as the new back
 		Node Nod = L->back->prev;
 		L->back->prev->next = NULL;
 		freeNode(&L->back);
 		L->back = Nod;
 		L->n--;
 	}
-
-	/*
-	if(length(L) == 1){
-		//freeNode(&L->front);
-		freeNode(&L->back);
-	}else{
-		Node Nod = L->back;
-		L->back = L->back->prev;
-		freeNode(&Nod);
-		L->n--;
-	}
-	*/
 }	
 	
 void delete(List L){ // Delete cursor element, making cursor undefined.
@@ -491,11 +477,16 @@ void delete(List L){ // Delete cursor element, making cursor undefined.
 	if(L->cursor == NULL){
 		return;
 	}
+	//if cursor is the front then deleteFront()
 	if(L->cursor == L->front){
 		deleteFront(L);
+	//if cursor is the back then deleteBack()
 	}else if(L->cursor == L->back){
 		deleteBack(L);
 	}else{
+		//set the current cursor's next's previous and prev's next to null
+		//free the cursor
+		//make the new cursor into the new node
 		L->cursor->next->prev = NULL;
 		L->cursor->prev->next = NULL;
 		freeNode(&L->cursor);
@@ -503,15 +494,6 @@ void delete(List L){ // Delete cursor element, making cursor undefined.
 		L->idx = -1;
 		L->n--;
 	}
-
-	/*
-	Node Nod = L->cursor;
-	L->cursor->prev->next = L->cursor->next;
-	L->cursor->next->prev = L->cursor->prev;
-	freeNode(&Nod);
-	L->n--;
-	L->idx = -1;
-*/
 }	
 	
 // Other operations -----------------------------------------------------------
@@ -527,6 +509,7 @@ void printList(FILE* out, List L){ // Prints to the file pointed to by out, a
 	if(out == NULL){
 		return;
 	}
+	//loop through the list and print the current node's data into the outfile
 	Node Nod = NULL;
 	for(Nod = L->front; Nod != NULL; Nod = Nod->next){
 		fprintf(out, "%d ", Nod->data);
@@ -541,10 +524,12 @@ List copyList(List L){ // Returns a new List representing the same integer
 		fprintf(stderr, "List Error calling copyList() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
+	//if the list is empty then return an empty list
 	if(length(L) == 0){
 		List R = newList();
 		return R;
 	}
+	//loop through the list and add each node to the new list
 	Node Nod = NULL;
 	List R = newList();
 	for(Nod = L->front; Nod != NULL; Nod = Nod->next){

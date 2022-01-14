@@ -1,3 +1,13 @@
+/****************************************
+ * James Gu
+ * jjgu
+ * pa1
+ *
+ *
+ *
+****************************************/
+
+
 #include "List.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,7 +42,6 @@ int main(int argc, char * argv[]){
 
 	char line[MAX_LEN];
 	int n = 0;
-	//int count = 0;
 
 	//count how many lines in the file there are
 	while (fgets(line, MAX_LEN, in) != NULL){
@@ -45,41 +54,16 @@ int main(int argc, char * argv[]){
 	char **arr;
 	arr = malloc(n * (sizeof(char*)));
 	
-	//char* arr[n];
-	
-	/*
-	char *curr_str;
-	//add each line to the infile, line by line
-	while(fgets(line, MAX_LEN, in) != NULL){
-		line[strlen(line)-1] = '\0';
-		//strcpy(curr_str, line);
-		curr_str = line;
-		arr[count] = *curr_str;
-		count++;
-	}
-	*/
-	/*
-	while(!feof(in)){
-		fgets(arr[count], MAX_LEN, in);
-		count++;	
-	}
-	*/
-	
+	//add every string in the lines to the arr
 	for(int i = 0; i < n; i++){
 		arr[i] = malloc(sizeof(char)*MAX_LEN);
 		fgets(arr[i], MAX_LEN, in);		
 	}
 	
-	/*
-	int i = 0;
-	while(fgets(line, MAX_LEN, in)){
-		arr[i] = malloc(MAX_LEN);
-		strcpy(arr[i], line);
-		i++;
-	}
-	*/
+	//create an empty list
 	List L = newList();
 	int curr_ele;
+	//use insertion sort to add the elements into the list
 	for(int i = 0; i < n; i++){
 		if(i == 0){
 			append(L, 0);
@@ -100,31 +84,6 @@ int main(int argc, char * argv[]){
 		}
 	}
 
-	/*
-	//create the list of integers
-	int list[n];
-	//add numbers 0-n to the list
-	for(int i = 0; i < n; i++){
-		list[i] = i;
-	}
-	//use insertion sort algorithm to sort the list based on the string array
-	//Credit for the insertion sort algorithm: Assignment 3 pdf from CSE 13s 
-	for(int i = 1; i < n; i++){
-		int j = i;
-		char * temp = arr[i];
-		while(j > 0 && (strcmp(temp, arr[j-1]) < 0 || strcmp(temp, arr[j-1]) == 0)){
-			list[j] = list[j-1];
-			j--;
-		}
-		list[j] = i;
-	}
-	*/
-
-	
-	//print the array in alphabetical order to the output file
-	//fprintf(out, "hi");
-	//printList(out, L);
-	
 	moveFront(L);
 	
 	for(int i = 0; i < n; i++){
@@ -135,13 +94,14 @@ int main(int argc, char * argv[]){
 	//close files
 	fclose(in);
 	fclose(out);
-	//free the string array
-		
+	
+	//free the string array	
 	for(int i = 0; i < length(L); i++){
 		free(arr[i]);
 	}
-	
-	free(arr);	
+	free(arr);
+
+	//free the list	
 	freeList(&L);
 	L = NULL;
 	return(0);
