@@ -55,7 +55,7 @@ void freeList(List* pL){ // Frees all heap memory associated with *pL, and sets
 	}
 }
 
-// Access functions -----------------------------------------------------------
+// Access function -----------------------------------------------------------
 int length(List L){ // Returns the number of elements in L.
 	if(L == NULL){
 		fprintf(stderr, "List Error: calling length() on NULL List reference\n");
@@ -145,15 +145,13 @@ void clear(List L){ // Resets L to its original empty state.
 		deleteFront(L);
 	}
 	*/
-	
-	Node Nod = L->front;
-	while(true){
-		Node NodTemp = Nod->next;
-		freeNode(&Nod);
-		Nod = NodTemp;
-		if(Nod == NULL){
-			break;
-		}		
+	if(L->front != NULL){		
+		Node Nod = L->front;
+		while(Nod != NULL){
+			Node NodTemp = Nod->next;
+			freeNode(&Nod);
+			Nod = NodTemp;	
+		}
 	}
 	L->n = 0;
 
@@ -264,10 +262,12 @@ void moveNext(List L){ // If cursor is defined and not at back, move cursor one
 
 void prepend(List L, int x){ // Insert new element into L. If L is non-empty, 
  // insertion takes place before front element.
+	/*
 	if(L == NULL){
 		fprintf(stderr, "List Error: calling prepend() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
+	*/
 	Node Nod = newNode(x);
 	if(length(L) == 0){
 		L->front = L->back = Nod;
@@ -284,10 +284,12 @@ void prepend(List L, int x){ // Insert new element into L. If L is non-empty,
 
 void append(List L, int x){ // Insert new element into L. If L is non-empty, 
  // insertion takes place after back element.
+	/*
 	if(L == NULL){
 		fprintf(stderr, "List Error: calling append() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
+	*/
 	Node Nod = newNode(x);
 	if(length(L) == 0){
 		L->front = L->back = Nod;
@@ -493,6 +495,10 @@ List copyList(List L){ // Returns a new List representing the same integer
 	if(L == NULL){
 		fprintf(stderr, "List Error calling copyList() on NULL List reference\n");
 		exit(EXIT_FAILURE);
+	}
+	if(length(L) == 0){
+		List R = newList();
+		return R;
 	}
 	Node Nod = NULL;
 	List R = newList();
