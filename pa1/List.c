@@ -121,6 +121,9 @@ bool equals(List A, List B){ // Returns true iff Lists A and B are in same
 		fprintf(stderr, "List Error: calling equals() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
+	if(length(A) == 0 && length(B) == 0){
+		return true;
+	}
 	if(length(A) != length(B) || front(A) != front(B) || back(A) != back(B)){
 		return false;
 	}
@@ -140,20 +143,24 @@ bool equals(List A, List B){ // Returns true iff Lists A and B are in same
 
  // Manipulation procedures ----------------------------------------------------
 void clear(List L){ // Resets L to its original empty state.
-	/*
+	
 	while(length(L) > 0){
 		deleteFront(L);
 	}
-	*/
+	
+	/*
 	if(L->front != NULL){		
 		Node Nod = L->front;
 		while(Nod != NULL){
 			Node NodTemp = Nod->next;
-			freeNode(&Nod);
+			if(Nod != NULL){
+				freeNode(&Nod);
+			}
 			Nod = NodTemp;	
 		}
 	}
 	L->n = 0;
+	*/
 
 	L->idx = -1;
 }
@@ -354,7 +361,7 @@ void deleteFront(List L){ // Delete the front element. Pre: length()>0
 		fprintf(stderr, "List Error: calling deleteFront() on an empty List\n");
 		exit(EXIT_FAILURE);
 	}
-	
+/*	
 	if(L->cursor == L->front){
 		L->cursor = NULL;
 		L->idx = -1;
@@ -375,8 +382,8 @@ void deleteFront(List L){ // Delete the front element. Pre: length()>0
 	}
 
 	L->n--;
+*/	
 	
-/*	
 	if(L->front == NULL){
 		return;
 	}
@@ -395,9 +402,8 @@ void deleteFront(List L){ // Delete the front element. Pre: length()>0
 		L->front = Nod;
 		L->n--;
 	}
-*/	
-/*	
-	if(L->idx != -1){
+	
+/*	if(L->idx != -1){
 		L->idx--;
 		if(L->idx <= -1){
 			L->cursor = NULL;
