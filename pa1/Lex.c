@@ -119,7 +119,7 @@ int main(int argc, char * argv[]){
 	moveFront(L);
 	
 	for(int i = 0; i < n; i++){
-		fprintf(out, "%d\n", get(L));
+		fprintf(out, "%s", arr[get(L)]);
 		moveNext(L);
 	}
 	
