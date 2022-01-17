@@ -1,17 +1,80 @@
+#include "Graph.h"
+#include "List.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+//structs
+typedef struct GraphObj{
+	List *neighbors;
+	int *color;
+	int *parent;
+	int *distance;
+	int order;
+	int size;
+	int recent;
+}
+
 /*** Constructors-Destructors ***/
-Graph newGraph(int n);
-void freeGraph(Graph* pG);
+Graph newGraph(int n){
+	Graph G = malloc(sizeof(GraphObj));
+	G->neighbors = calloc(n+1, sizeof(List));
+	G->color = calloc(n+1, sizeof(int));
+	G->parent = calloc(n+1, sizeof(int));
+	G->distance = calloc(n+1, sizeof(int));
+	G->order = n;
+	G->size = 0;
+	G->recent = NIL;
+	return G;
+}
+
+void freeGraph(Graph* pG){
+	
+}
+
 /*** Access functions ***/
-int getOrder(Graph G);
-int getSize(Graph G);
-int getSource(Graph G);
-int getParent(Graph G, int u);
-int getDist(Graph G, int u);
-void getPath(List L, Graph G, int u);
+int getOrder(Graph G){
+
+}
+
+int getSize(Graph G){
+
+}
+
+int getSource(Graph G){
+
+}
+
+int getParent(Graph G, int u){
+
+}
+
+int getDist(Graph G, int u){
+
+}
+
+void getPath(List L, Graph G, int u){
+
+}
+
 /*** Manipulation procedures ***/
-void makeNull(Graph G);
-void addEdge(Graph G, int u, int v);
-void addArc(Graph G, int u, int v);
-void BFS(Graph G, int s);
+void makeNull(Graph G){
+
+}
+
+void addEdge(Graph G, int u, int v){
+
+}
+
+void addArc(Graph G, int u, int v){
+
+}
+
+void BFS(Graph G, int s){
+
+}
+
 /*** Other operations ***/
-void printGraph(FILE* out, Graph G);
+void printGraph(FILE* out, Graph G){
+
+}
