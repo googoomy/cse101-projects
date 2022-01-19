@@ -129,15 +129,44 @@ void getPath(List L, Graph G, int u){
 
 /*** Manipulation procedures ***/
 void makeNull(Graph G){
-
+	int graph_order = getOrder(G);
+	freeGraph(&G);
+	Graph G = newGraph(graph_order);
 }
 
 void addEdge(Graph G, int u, int v){
-
+	if(G == NULL){
+		fprintf(stderr, "Graph Error: calling addEdge() on NULL Graph reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(u < 1 || u > getOrder(G)){
+		fprintf(stderr, "Graph Error: calling addEdge() with invalid index. The range of index should be 1 <= u <= getOrder(G)\n");
+		exit(EXIT_FAILURE);
+	}
+	if(v < 1 || v > getOrder(G)){
+		fprintf(stderr, "Graph Error: calling addEdge() with invalid index. The range of index should be 1 <= v <= getOrder(G)\n");
+		exit(EXIT_FAILURE);
+	}
+	append(G->neighbors[u], v);
+	append(G->neighbors[v], u);
+	G->size++;
 }
 
 void addArc(Graph G, int u, int v){
-
+	if(G == NULL){
+		fprintf(stderr, "Graph Error: calling addEdge() on NULL Graph reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(u < 1 || u > getOrder(G)){
+		fprintf(stderr, "Graph Error: calling addEdge() with invalid index. The range of index should be 1 <= u <= getOrder(G)\n");
+		exit(EXIT_FAILURE);
+	}
+	if(v < 1 || v > getOrder(G)){
+		fprintf(stderr, "Graph Error: calling addEdge() with invalid index. The range of index should be 1 <= v <= getOrder(G)\n");
+		exit(EXIT_FAILURE);
+	}
+	append(G->neighbors[u], v);
+	G->size++;
 }
 
 void BFS(Graph G, int s){
