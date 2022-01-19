@@ -4,6 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define WHITE 0
+#define GRAY 1
+#define BLACK 2
+
+
 //structs
 typedef struct GraphObj{
 	List *neighbors;
@@ -170,10 +175,59 @@ void addArc(Graph G, int u, int v){
 }
 
 void BFS(Graph G, int s){
+	if(G == NULL){
+		fprintf(stderr, "Graph Error: calling BFS() on NULL Graph reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(s < 1 || s > getOrder(G)){
+		fprintf(stderr, "Graph Error: calling BFS() with invalid index. The range of index should be 1 <= s <= getOrder(G)\n");
+		exit(EXIT_FAILURE);
+	}
+	G->source = s;
+	for(int i = 1; i <= getOrder(G); i++){
+		G->color[i] = WHITE;
+		G->distance[i] = INF;
+		G->parent[i] = NIL;
+	}
+	G->color[s] = GRAY;
+	G->distance[s] = 0;
+	G->parent[s] = NIL;
+	List L = newList();
+	append(L, s);
+	while(length(L) > 0){
+		int x = front(L);
+		deleteFront(L);
+		for(int y = 1; y <= length(G->neighbors[x]; y++)){
+			if(G->color[y] == WHITE){
+				G->color[y] = GRAY;
+				G->distance[y] = G->distance[x] + 1;
+				G->parent[y] = x;
+				append(L, y);
+			}	
+		}
+		G->color[x] = BLACK;	
+	}
+	freeList(&L);
 
 }
 
 /*** Other operations ***/
 void printGraph(FILE* out, Graph G){
-
+	if(G == NULL){
+		fprintf(stderr, "Graph Error: calling printGraph() on NULL Graph reference\n");
+		exit(EXIT_FAILURE);
+	}
+	for(int i = 1; i <= getOrder(G); i++){
+		fprintf(out, "%d: ", i);
+		moveFront(G->neighbors[i]);
+		for(int j = 1; j <= length(G->neighbors[i]); j++){
+			int curr_ele = get(G->neighbors[i]);
+			if(curr_ele > 0){
+				fprintf(out, "%d ", curr_ele);
+			}
+			moveNext(G->neighbors[i]);
+		}
+		fprintf(out, "\n");
+	}
+	fprintf(out, "\n");
 }
