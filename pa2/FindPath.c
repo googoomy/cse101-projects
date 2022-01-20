@@ -55,7 +55,7 @@ int main(int argc, char * argv[]){
 		}else{
 			List L = newList();
 			getPath(L, G, destination);
-			fprintf(out, "\nThe distance from %d to %d is %d\n", source, destination, getDist(G, y));
+			fprintf(out, "\nThe distance from %d to %d is %d\n", source, destination, getDist(G, destination));
 			fprintf(out, "A shortest %d-%d path is: ", source, destination);
 			printList(out, L);
 			fprintf(out, "\n");

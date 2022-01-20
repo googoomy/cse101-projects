@@ -18,7 +18,7 @@ typedef struct GraphObj{
 	int order;
 	int size;
 	int source;
-}
+} GraphObj;
 
 /*** Constructors-Destructors ***/
 Graph newGraph(int n){
@@ -35,8 +35,8 @@ Graph newGraph(int n){
 
 void freeGraph(Graph* pG){
 	if(pG != NULL && * pG != NULL){
-		for(int i = 1; i <= getOrder(pG); i++){
-			freeList(&(pG->neighbors[i]));
+		for(int i = 1; i <= getOrder(*pG); i++){
+			freeList(&((*pG)->neighbors[i]));
 		}
 		free((*pG)->neighbors);
 		free((*pG)->color);
@@ -126,7 +126,7 @@ void getPath(List L, Graph G, int u){
 	}else if(G->parent[u] == NIL){
 		append(L, NIL);
 	}else{
-		getPath(L, G, getParent(G, u);
+		getPath(L, G, getParent(G, u));
 		append(L, u);
 	}
 
@@ -136,7 +136,7 @@ void getPath(List L, Graph G, int u){
 void makeNull(Graph G){
 	int graph_order = getOrder(G);
 	freeGraph(&G);
-	Graph G = newGraph(graph_order);
+	G = newGraph(graph_order);
 }
 
 void addEdge(Graph G, int u, int v){
@@ -197,7 +197,7 @@ void BFS(Graph G, int s){
 	while(length(L) > 0){
 		int x = front(L);
 		deleteFront(L);
-		for(int y = 1; y <= length(G->neighbors[x]; y++)){
+		for(int y = 1; y <= length(G->neighbors[x]); y++){
 			if(G->color[y] == WHITE){
 				G->color[y] = GRAY;
 				G->distance[y] = G->distance[x] + 1;
