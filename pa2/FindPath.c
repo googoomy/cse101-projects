@@ -27,4 +27,40 @@ int main(int argc, char * argv[]){
 		fprintf(stderr, "Unable to open file %s for writing\n", argv[2]);
 		exit(EXIT_FAILURE);
 	}
+	int n = 0;
+	fscanf(in, "%d", &n);
+	
+	Graph G = newGraph(n);
+	
+	int u, v = 1;
+	while(!feof(in)){
+		fscanf(in, "%d %d", &u, &v);
+		if(u == 0 && v == 0){
+			break;
+		}
+		addEdge(G, u, v);
+	}
+	printGraph(out, G);
+	
+	int source, destination = 1;
+	while(!feof(in)){
+		fscanf(in, "%d %d", &source, &destination);
+		if(source == 0 && destination == 0){
+			break;
+		}
+		BFS(G, source);
+		if(getDist(G, destination) == INF){
+			fprintf(out, "\nThe distance from %d to %d is infinity\n", source, destination);
+			fprintf(out, "No %d-%d path exists\n", source, destination);
+		}else{
+			List L = newList();
+			getPath(L, G, destination);
+			fprintf(out, "\nThe distance from %d to %d is %d\n", source, destination, getDist(G, y));
+			fprintf(out, "A shortest %d-%d path is: ", source, destination);
+			printList(out, L);
+			fprintf(out, "\n");
+			freeList(&L);
+		}
+	}
+}	
 
