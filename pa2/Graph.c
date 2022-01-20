@@ -142,8 +142,24 @@ void makeNull(Graph G){
 	G = newGraph(graph_order);
 }
 
-void addVertex(List L, v){
-	
+void addVertex(List L, int v){
+	if(length(L) == 0){
+		append(L,v);
+		return;
+	}
+	moveFront(L);
+	for(int i = 0; i < length(L); i++){
+		int curr_ele = get(L);
+		if(curr_ele >= v){
+			insertBefore(L, v);
+			break;
+		}
+		moveNext(L);
+		if(i == length(L)-1){
+			append(L, v);
+			break;		
+		}
+	}
 }
 
 
@@ -160,8 +176,8 @@ void addEdge(Graph G, int u, int v){
 		fprintf(stderr, "Graph Error: calling addEdge() with invalid index. The range of index should be 1 <= v <= getOrder(G)\n");
 		exit(EXIT_FAILURE);
 	}
-	append(G->neighbors[u], v);
-	append(G->neighbors[v], u);
+	addVertex(G->neighbors[u], v);
+	addVertex(G->neighbors[v], u);
 	G->size++;
 }
 
@@ -178,7 +194,7 @@ void addArc(Graph G, int u, int v){
 		fprintf(stderr, "Graph Error: calling addEdge() with invalid index. The range of index should be 1 <= v <= getOrder(G)\n");
 		exit(EXIT_FAILURE);
 	}
-	append(G->neighbors[u], v);
+	addVertex(G->neighbors[u], v);
 	G->size++;
 }
 
