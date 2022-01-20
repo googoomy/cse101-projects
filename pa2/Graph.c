@@ -27,6 +27,9 @@ Graph newGraph(int n){
 	G->color = calloc(n+1, sizeof(int));
 	G->parent = calloc(n+1, sizeof(int));
 	G->distance = calloc(n+1, sizeof(int));
+	for(int i = 1; i <= n; i++){
+		G->neighbors[i] = newList();
+	}
 	G->order = n;
 	G->size = 0;
 	G->source = NIL;
@@ -138,6 +141,11 @@ void makeNull(Graph G){
 	freeGraph(&G);
 	G = newGraph(graph_order);
 }
+
+void addVertex(List L, v){
+	
+}
+
 
 void addEdge(Graph G, int u, int v){
 	if(G == NULL){
