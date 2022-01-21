@@ -1,0 +1,7 @@
+#James Gu
+#jjgu
+#Winter2022
+#PA2
+##Description of Program: This program is an implementation of the Graph ADT and is written in C. The main program is called FindPath.c and the implementation is in Graph.c. The Graph ADT consists of vertices that connect to one another and can be represented with a tree or adjacency lists. Each of these vertices have a number assigned to them. Additionally, each vertex can connect to another vertex either directed (one-way) or undirected (both ways). The main functionality of this program is its BFS() function which implements the Breadth First Search algorithm. With this function, the Graph can be used to find the shortest path from a source vertex to a destination vertex. 
+###Build for Program: List.h: the header file for List.c that layouts the interface, List.c: contains the implementation for the List ADT, Graph.h: the header file for Graph.c that layouts the interface, Graph.c: contains the implementation for the Graph ADT, GraphTest.c: a program to help test the Graph, FindPath.c: the main for this program, the input is a infile and outputs an adjacency list into the outfile, Makefile: This file compiles the program by typing in make in the command line. README.md: describes the program and build for the program.
+####User Guide: The first stop to use this program is to use the command make. Then the user can type in ./FindPath <infile> <outfile> so they can find the shortest path between source and destination vertices. 
