@@ -1,4 +1,6 @@
 #------------------------------------------------------------------------------
+#  James Gu
+#  jjgu
 #  Makefile for CMPS 101 Programming Assignment 2
 #
 #  make                     makes FindPath
