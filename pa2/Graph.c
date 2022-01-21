@@ -143,7 +143,7 @@ void makeNull(Graph G){
 }
 
 void addVertex(List L, int v){
-	if(length(L) == 0){
+	if(length(L) <= 0){
 		append(L,v);
 		return;
 	}
@@ -218,6 +218,7 @@ void BFS(Graph G, int s){
 	G->parent[s] = NIL;
 	List L = newList();
 	append(L, s);
+	/*
 	while(length(L) > 0){
 		int x = front(L);
 		deleteFront(L);
@@ -231,6 +232,35 @@ void BFS(Graph G, int s){
 		}
 		G->color[x] = BLACK;	
 	}
+	*/
+
+	while(length(L) != 0){
+		moveFront(L);
+		int x = get(L);
+		deleteFront(L);
+		if(length(G->neighbors[x]) != 0){
+			moveFront(G->neighbors[x]);
+		}
+		while(index(G->neighbors[x]) != -1){
+			int y = get(G->neighbors[x]);
+			if(G->color[y] == WHITE){
+				G->color[y] = GRAY;
+				G->distance[y] = G->distance[x] + 1;
+				G->parent[y] = x;
+				append(L, y);
+			}	
+			moveNext(G->neighbors[x]);
+		}
+		G->color[x] = BLACK;	
+	}
+
+	/*
+	moveFront(L);
+	while(index(L) != -1){
+		int curr_ele = get(L);
+
+	}
+	**/
 	freeList(&L);
 
 }
