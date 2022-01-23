@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "Graph.h"
+#include "List.h"
 
 int main (){
 	int n = 5;
@@ -31,6 +32,13 @@ int main (){
 	parent = getParent(G, 2);
 	distance = getDist(G, 2);
        	printf("order: %d\nsize: %d\nsource: %d\nparent: %d\ndistance: %d\n", order, size, source, parent, distance);
+	List L = newList();
+	getPath(L, G, 4);
+	printf("path 1 to 4: ");
+	printList(stdout, L);
+	freeList(&L);
+	printf("\n");
+	printGraph(stdout, G);
 	makeNull(G);
 	freeGraph(&G);
 
