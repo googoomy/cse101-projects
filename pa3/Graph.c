@@ -1,7 +1,7 @@
 /******************************************************************
  *James Gu
  *jjgu
- *pa2
+ *pa3
  *
  *
  *
@@ -94,90 +94,7 @@ int getSize(Graph G){
 	return G->size;
 }
 
-//Function getSource returns the source vertex most recently used in BFS() or NIL if BFS() hasn't been called yet
-int getSource(Graph G){
-	if(G == NULL){
-		fprintf(stderr, "Graph Error: calling getSource() on NULL Graph reference\n");
-		exit(EXIT_FAILURE);
-	}
-	if(G->source == NIL){
-		return NIL;
-	}
-	return G->source;
-
-}
-
-//Function getParent() will return the parent of vertex u in the BFS tree created by BFS()
-//Precondition: 1<=u<=getORder(G)
-int getParent(Graph G, int u){
-	if(G == NULL){
-		fprintf(stderr, "Graph Error: calling getParent() on NULL Graph reference\n");
-		exit(EXIT_FAILURE);
-	}
-	if(u < 1 || u > getOrder(G)){
-		fprintf(stderr, "Graph Error: calling getParent() with invalid index. The range of index should be 1 <= u <= getOrder(G)\n");
-		exit(EXIT_FAILURE);
-	}
-	if(getSource(G) == NIL){
-		return NIL;
-	}
-	return G->parent[u];
-
-}
-
-//Function getDist() returns the distance from the most recent BFS source to vertex u or INF if BFS() hasn't been called yet
-//Precondition:1<=u<=getOrder(G)
-int getDist(Graph G, int u){
-	if(G == NULL){
-		fprintf(stderr, "Graph Error: calling getDist() on NULL Graph reference\n");
-		exit(EXIT_FAILURE);
-	}
-	if(u < 1 || u > getOrder(G)){
-		fprintf(stderr, "Graph Error: calling getDist() with invalid index. The range of index should be 1 <= u <= getOrder(G)\n");
-		exit(EXIT_FAILURE);
-	}
-	if(getSource(G) == NIL){
-		return INF;
-	}
-	return G->distance[u];
-
-}
-
-//Function getPath() append to the List L the vertices of the shortest path in G from source to u, or appends to L the value of NIL if no such path exists.
-//Precondition: getSource(G) != NIL, 1<=u<=getOrder(G)
-void getPath(List L, Graph G, int u){
-	if(G == NULL){
-		fprintf(stderr, "Graph Error: calling getPath() on NULL Graph reference\n");
-		exit(EXIT_FAILURE);
-	}
-	if(u < 1 || u > getOrder(G)){
-		fprintf(stderr, "Graph Error: calling getPath() with invalid index. The range of index should be 1 <= u <= getOrder(G)\n");
-		exit(EXIT_FAILURE);
-	}
-	if(getSource(G) == NIL){
-		fprintf(stderr, "Graph Error: calling getPath() on NIL Source. BFS() must be called before getPath()\n");
-		exit(EXIT_FAILURE);
-	}
-	if(getSource(G) == u){
-		append(L, u);
-	}else if(G->parent[u] == NIL){
-		append(L, NIL);
-	}else{
-		//recursively call getPath
-		getPath(L, G, getParent(G, u));
-		append(L, u);
-	}
-
-}
-
 /*** Manipulation procedures ***/
-//makeNull() restores G to its original (no edge) state
-void makeNull(Graph G){
-	int graph_order = getOrder(G);
-	freeGraph(&G);
-	G = newGraph(graph_order);
-}
-
 //helper function that maintains the lists in sorted order by increasing labels
 void addVertex(List L, int v){
 	//similar to the insertion sort in Lex.c in pa1
@@ -239,67 +156,6 @@ void addArc(Graph G, int u, int v){
 	}
 	addVertex(G->neighbors[u], v);
 	G->size++;
-}
-
-//Function BFS() runs the BFS algorithm on the Graph G with source s, setting the color, distance, parent, and source fields of G accordingly. 
-//Credit: BFS pseudocode from the handouts
-void BFS(Graph G, int s){
-	if(G == NULL){
-		fprintf(stderr, "Graph Error: calling BFS() on NULL Graph reference\n");
-		exit(EXIT_FAILURE);
-	}
-	if(s < 1 || s > getOrder(G)){
-		fprintf(stderr, "Graph Error: calling BFS() with invalid index. The range of index should be 1 <= s <= getOrder(G)\n");
-		exit(EXIT_FAILURE);
-	}
-	//set the source to s
-	G->source = s;
-	//intialize every array with default values
-	for(int i = 1; i <= getOrder(G); i++){
-		G->color[i] = WHITE;
-		G->distance[i] = INF;
-		G->parent[i] = NIL;
-	}
-	//set source vertex to gray (discover it)
-	G->color[s] = GRAY;
-	G->distance[s] = 0;
-	G->parent[s] = NIL;
-	//equivalent of the queue in the example
-	List L = newList();
-	append(L, s);
-	
-	//while the queue has vertices
-	while(length(L) != 0){
-		//dequeue()
-		moveFront(L);
-		int x = get(L);
-		deleteFront(L);
-		//if the current neighbors[x] isnt empty then start at beginning
-		if(length(G->neighbors[x]) != 0){
-			moveFront(G->neighbors[x]);
-		}
-		//loop through neighbrs[x]
-		while(index(G->neighbors[x]) != -1){
-			//y = curr_ele
-			int y = get(G->neighbors[x]);
-			//if the current element is undiscovered
-			if(G->color[y] == WHITE){
-				//then discover it
-				G->color[y] = GRAY;
-				G->distance[y] = G->distance[x] + 1;
-				G->parent[y] = x;
-				append(L, y);
-			}
-			//go to next element	
-			moveNext(G->neighbors[x]);
-		}
-		//the vertex has no other ways to go so it is done now
-		//so make it black
-		G->color[x] = BLACK;	
-	}
-	//free the queue because it is temporary
-	freeList(&L);
-
 }
 
 /*** Other operations ***/
