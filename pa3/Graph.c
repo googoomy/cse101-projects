@@ -94,6 +94,25 @@ int getSize(Graph G){
 	return G->size;
 }
 
+//Function getParent() will return the parent of vertex u in the BFS tree created by BFS()
+//Precondition: 1<=u<=getORder(G)
+int getParent(Graph G, int u){
+	if(G == NULL){
+		fprintf(stderr, "Graph Error: calling getParent() on NULL Graph reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(u < 1 || u > getOrder(G)){
+		fprintf(stderr, "Graph Error: calling getParent() with invalid index. The range of index should be 1 <= u <= getOrder(G)\n");
+		exit(EXIT_FAILURE);
+	}
+	if(getSource(G) == NIL){
+		return NIL;
+	}
+	return G->parent[u];
+
+}
+
+
 /*** Manipulation procedures ***/
 //helper function that maintains the lists in sorted order by increasing labels
 void addVertex(List L, int v){
