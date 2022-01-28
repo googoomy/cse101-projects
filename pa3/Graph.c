@@ -22,20 +22,19 @@
 
 //structs
 typedef struct GraphObj{
-	//an array of Lists whose ith element contains the neighbors of vertex i
 	List *neighbors;
 	//an array of ints whose ith element is the color of vertex i
 	int *color;
 	//an array of ints whose ith element is the parent of vertex i
 	int *parent;
 	//an array of ints whose ith element is the distance from the source to vertex i
-	int *distance;
+	int *discover;
 	//the number of vertices
 	int order;
 	//the number of edges
 	int size;
 	//the label of the vertex that was most recently used as source for BFS
-	int source;
+	int *finish;
 } GraphObj;
 
 /*** Constructors-Destructors ***/
@@ -47,14 +46,18 @@ Graph newGraph(int n){
 	G->neighbors = calloc(n+1, sizeof(List));
 	G->color = calloc(n+1, sizeof(int));
 	G->parent = calloc(n+1, sizeof(int));
-	G->distance = calloc(n+1, sizeof(int));
+	G->discover = calloc(n+1, sizeof(int));
+	G->finish
 	//initialize every list in neighbors[]
 	for(int i = 1; i <= n; i++){
 		G->neighbors[i] = newList();
+		G->color[i] = WHITE;
+		G->parent[i] = NIL;
+		G->discover[i] = UNDEF;
+		G->finish[i] = UNDEF;
 	}
 	G->order = n;
 	G->size = 0;
-	G->source = NIL;
 	return G;
 }
 
@@ -69,7 +72,8 @@ void freeGraph(Graph* pG){
 		free((*pG)->neighbors);
 		free((*pG)->color);
 		free((*pG)->parent);
-		free((*pG)->distance);
+		free((*pG)->discover);
+		free((*pG)->finsih);
 		free(*pG);
 		*pG = NULL;
 	}	
@@ -105,13 +109,33 @@ int getParent(Graph G, int u){
 		fprintf(stderr, "Graph Error: calling getParent() with invalid index. The range of index should be 1 <= u <= getOrder(G)\n");
 		exit(EXIT_FAILURE);
 	}
-	if(getSource(G) == NIL){
-		return NIL;
-	}
 	return G->parent[u];
 
 }
 
+int getDiscover(Graph G, int u){
+	if(G == NULL){
+		fprintf(stderr, "Graph Error: calling getDiscover() on NULL Graph reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(u < 1 || u > getOrder(G)){
+		fprintf(stderr, "Graph Error: calling getDiscover() with invald index. The range of index should be 1 <= u <= getOrder(G)\n");
+		exit(EXIT_FAILURE);
+	}
+	return G->discover[u];
+}
+
+int getFinish(Graph G, int u){
+	if(G == NULL){
+		fprintf(stderr, "Graph Error: calling getFinish() on NULL Graph reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(u < 1 || u > getOrder(G)){
+		fprintf(stderr, "Graph Error: calling getFinish() with invald index. The range of index should be 1 <= u <= getOrder(G)\n");
+		exit(EXIT_FAILURE);
+	}
+	return G->finish[u];
+}
 
 /*** Manipulation procedures ***/
 //helper function that maintains the lists in sorted order by increasing labels
@@ -177,8 +201,28 @@ void addArc(Graph G, int u, int v){
 	G->size++;
 }
 
+void DFS(Graph G, List S){
+	if(G == NULL){
+		fprintf(stderr, "Graph Error: calling DFS() on NULL Graph reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(length(S) !=  getOrder(G)){
+		fprintf(stderr, "Graph Error: calling DFS() with invald sized Stack. The stack's length should be equal to getOrder(G)\n");
+		exit(EXIT_FAILURE);
+	}
+
+}
+
 /*** Other operations ***/
 //printGraph prints the adjacency list representation of G to file out
+Graph transpose(Graph G){
+
+}
+
+Graph copyGraph(Graph G){
+
+}
+
 void printGraph(FILE* out, Graph G){
 	if(G == NULL){
 		fprintf(stderr, "Graph Error: calling printGraph() on NULL Graph reference\n");
