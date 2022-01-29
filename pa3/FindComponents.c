@@ -38,6 +38,26 @@ int main(int argc, char * argv[]){
 		exit(EXIT_FAILURE);
 	}
 	
+	//get the order of the graph
+	int n = 0;
+	fscanf(in, "%d", &n);
+	//make the graph
+	Graph G = newGraph(n);
+	//make the entire graph with the infile
+	//initialize the pairs of vertices
+	int u, v = 1;
+	while(!feof(in)){
+		//get from the file the vertices pair
+		fscanf(in, "%d %d", &u, &v);
+		// pair (0,0) terminates loop
+		if(u == 0 && v == 0){
+			break;
+		}
+		//add the pair to the graph
+		addEdge(G, u, v);
+	}
+	//print the contructed graph to the outfile
+	printGraph(out, G);
 
 
 
