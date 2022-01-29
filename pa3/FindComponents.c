@@ -37,4 +37,8 @@ int main(int argc, char * argv[]){
 		fprintf(stderr, "Unable to open file %s for writing\n", argv[2]);
 		exit(EXIT_FAILURE);
 	}
+	
 
+
+
+}
