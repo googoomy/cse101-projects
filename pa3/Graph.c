@@ -210,7 +210,20 @@ void DFS(Graph G, List S){
 		fprintf(stderr, "Graph Error: calling DFS() with invald sized Stack. The stack's length should be equal to getOrder(G)\n");
 		exit(EXIT_FAILURE);
 	}
+	for(int i = 1; i <= getOrder(G); i++){
+		color[i] = WHITE;
+		parent[i] = NIL;
+	}
+	int time = 0;
+	for(int i = 1; i <= getOrder(G); i++){
+		if(color[i] == WHITE){
+			visit(G, S, i, &time);
+		}
+	}
+}
 
+void visit(Graph G, List S, int i, int* time){
+	
 }
 
 /*** Other operations ***/
