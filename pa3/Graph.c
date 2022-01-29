@@ -223,16 +223,58 @@ void DFS(Graph G, List S){
 }
 
 void visit(Graph G, List S, int i, int* time){
-	
+	G->discover[i] = ++(*time);
+	G->color[i] = GRAY;
+	moveFront(G->neighbors[i]);
+	for(int y = 1; y <= getOrder(i); y++){
+		int curr_ele = get(G->neighbors[i]);
+		if(color[curr_ele] == WHITE){
+			G->parent[curr_ele] = i;
+			visit(G, S, curr_ele, time);
+		}
+		moveNext(G->neighbors[i]);
+	}	
+	G->color[i] = BLACK;
+	G->finish[i] = ++(*time);
+	prepend(S, i);
 }
 
 /*** Other operations ***/
 //printGraph prints the adjacency list representation of G to file out
 Graph transpose(Graph G){
+	if(G == NULL){
+		fprintf(stderr, "Graph Error: calling transpose() on NULL Graph reference\n");
+		exit(EXIT_FAILURE);
+	}
+	Graph GT = newGraph(getOrder(G));
+	for(int i = 1; i < getOrder(G); i++){
+		moveFront(G->neighbors[i]);
+		for(int j = 1; j < length(G->neighbors[i]); j++){
+			int curr_ele = get(G->neighbors[i]);
+			addArc(GT, curr_ele, i);
+			moveNext(G->neighbors[i]);
+		}
+	}
+	return GT;
 
 }
 
 Graph copyGraph(Graph G){
+	if(G == NULL){
+		fprintf(stderr, "Graph Error: calling copyGraph() on NULL Graph reference\n");
+		exit(EXIT_FAILURE);
+	}
+	Graph CPY = newGraph(getOrder(G));
+	for(int i = 1; i < getOrder(G); i++){
+		moveFront(G->neighbors[i]);
+		for(int j = 1; j < length(G->neighbors[i]); j++){
+			int curr_ele = get(G->neighbors[i]);
+			addArc(CPY, i, curr_ele);
+			moveNext(G->neighbors[i]);
+		}
+	}
+	return CPY;
+
 
 }
 
