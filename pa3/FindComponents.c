@@ -54,11 +54,54 @@ int main(int argc, char * argv[]){
 			break;
 		}
 		//add the pair to the graph
-		addEdge(G, u, v);
+		addArc(G, u, v);
 	}
+	fprintf(out, "Adjacency list representation of G:\n");
 	//print the contructed graph to the outfile
 	printGraph(out, G);
+	
+	List S = newList();
+	for(int i = 1; i <= getOrder(G); i++){
+		append(S, i);
+	}
+	DFS(G, S);
+	Graph GT = transpose(G);
+	DFS(GT, S);
+	int strong_comps = 0;
+	moveBack(S);
+	for(int i = 1; i <=getOrder(G); i++){
+		int curr_par = getParent(GT, get(S));
+		if(curr_par == NIL){
+			strong_comps++;
+		}
+		movePrev(S);
+	}
 
+	fprintf(out, "G contains %d strongly connected components: \n", strong_comps);
+	moveBack(S);
+	List comps = newList();
+	for(int i = 1; i <= strong_comps; i++){
+		fprintf(out, "Component %d: ", i);
+		while(true){
+			prepend(comps, get(S));
+			int curr_par = getParent(GT, get(S));
+			if(curr_par == NIL){
+				printList(out, comps);
+				break;
+			}
 
+			movePrev(S);
+		}
+		movePrev(S);
+		clear(comps);
+	}
 
+	fclose(in);
+	fclose(out);
+	freeGraph(&G);
+	freeGraph(&GT);
+	clear(comps);
+	freeList(&comps);
+	clear(S);
+	freeList(&S);
 }
