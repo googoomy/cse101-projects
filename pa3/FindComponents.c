@@ -87,6 +87,7 @@ int main(int argc, char * argv[]){
 			int curr_par = getParent(GT, get(S));
 			if(curr_par == NIL){
 				printList(out, comps);
+				fprintf(out, "\n");
 				break;
 			}
 
