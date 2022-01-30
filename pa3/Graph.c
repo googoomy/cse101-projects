@@ -201,8 +201,10 @@ void addArc(Graph G, int u, int v){
 	G->size++;
 }
 
-void visit(Graph G, List *S, int i, int* time){
-	G->discover[i] = ++(*time);
+void visit(Graph G, List S, int i, int* time){
+	//G->discover[i] = ++(*time);
+	*time += 1;
+	G->discover[i] = *time;
 	G->color[i] = GRAY;
 	moveFront(G->neighbors[i]);
 	for(int y = 1; y <= length(G->neighbors[i]); y++){
@@ -214,8 +216,12 @@ void visit(Graph G, List *S, int i, int* time){
 		moveNext(G->neighbors[i]);
 	}	
 	G->color[i] = BLACK;
-	G->finish[i] = ++(*time);
-	prepend(*S, i);
+	//deleteBack(S);
+	prepend(S, i);
+	*time += 1;
+	G->finish[i] = *time;
+	//G->finish[i] = ++(*time);
+	//prepend(*S, i);
 }
 
 void DFS(Graph G, List S){
@@ -227,23 +233,34 @@ void DFS(Graph G, List S){
 		fprintf(stderr, "Graph Error: calling DFS() with invald sized Stack. The stack's length should be equal to getOrder(G)\n");
 		exit(EXIT_FAILURE);
 	}
+	moveFront(S);
 	for(int i = 1; i <= getOrder(G); i++){
-		G->color[i] = WHITE;
-		G->parent[i] = NIL;
+		int curr;
+		if(index(S) != -1){
+			curr = get(S);
+		}
+		G->color[curr] = WHITE;
+		G->parent[curr] = NIL;
+		moveNext(S);
 	}
 	moveFront(S);
 	int time = 0;
 	for(int i = 1; i <= getOrder(G); i++){
-		if(G->color[i] == WHITE){
-			visit(G, &S, i, &time);
+		int curr;
+		if(index(S) != -1){
+			curr = get(S);
+			moveNext(S);
 		}
-		moveNext(S);
+		if(G->color[curr] == WHITE){
+			visit(G, S, curr, &time);
+		}
 	}
 	//need to remove the 1 2 3 4 5 ... from the list
-	moveBack(S);
+	
 	for(int i = 1; i <= getOrder(G); i++){
 		deleteBack(S);
 	}
+	
 }
 
 /*** Other operations ***/

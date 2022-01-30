@@ -78,6 +78,7 @@ int main(int argc, char * argv[]){
 	}
 
 	fprintf(out, "G contains %d strongly connected components: \n", strong_comps);
+	/*
 	moveBack(S);
 	List comps = newList();
 	for(int i = 1; i <= strong_comps; i++){
@@ -96,13 +97,39 @@ int main(int argc, char * argv[]){
 		movePrev(S);
 		clear(comps);
 	}
+	*/
+
+	int comps = 1;
+	moveBack(S);
+	for(int i = 1; i <= strong_comps; i++){
+		if(getParent(GT, get(S)) == NIL){
+			int ele = 1;
+			fprintf(out, "Component %d: %d", comps, get(S));
+			moveNext(S);
+			for(int j = 0; j <= length(S); j++){
+				fprintf(out, " %d", get(S));
+				ele++;
+				moveNext(S);
+			}
+			for(int k = 1; k < ele; k++){
+				deleteBack(S);
+			}
+			moveBack(S);
+			fprintf(out, "\n");
+			comps++;
+		}else{
+			movePrev(S);
+		}
+	}
 
 	fclose(in);
 	fclose(out);
 	freeGraph(&G);
 	freeGraph(&GT);
+	/*
 	clear(comps);
 	freeList(&comps);
+	*/
 	clear(S);
 	freeList(&S);
 }
