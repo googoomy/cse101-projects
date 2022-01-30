@@ -201,7 +201,7 @@ void addArc(Graph G, int u, int v){
 	G->size++;
 }
 
-void visit(Graph G, List S, int i, int* time){
+void visit(Graph G, List *S, int i, int* time){
 	G->discover[i] = ++(*time);
 	G->color[i] = GRAY;
 	moveFront(G->neighbors[i]);
@@ -215,7 +215,7 @@ void visit(Graph G, List S, int i, int* time){
 	}	
 	G->color[i] = BLACK;
 	G->finish[i] = ++(*time);
-	prepend(S, i);
+	prepend(*S, i);
 }
 
 void DFS(Graph G, List S){
@@ -231,11 +231,18 @@ void DFS(Graph G, List S){
 		G->color[i] = WHITE;
 		G->parent[i] = NIL;
 	}
+	moveFront(S);
 	int time = 0;
 	for(int i = 1; i <= getOrder(G); i++){
 		if(G->color[i] == WHITE){
-			visit(G, S, i, &time);
+			visit(G, &S, i, &time);
 		}
+		moveNext(S);
+	}
+	//need to remove the 1 2 3 4 5 ... from the list
+	moveBack(S);
+	for(int i = 1; i <= getOrder(G); i++){
+		deleteBack(S);
 	}
 }
 
@@ -247,9 +254,9 @@ Graph transpose(Graph G){
 		exit(EXIT_FAILURE);
 	}
 	Graph GT = newGraph(getOrder(G));
-	for(int i = 1; i < getOrder(G); i++){
+	for(int i = 1; i <= getOrder(G); i++){
 		moveFront(G->neighbors[i]);
-		for(int j = 1; j < length(G->neighbors[i]); j++){
+		for(int j = 1; j <= length(G->neighbors[i]); j++){
 			int curr_ele = get(G->neighbors[i]);
 			addArc(GT, curr_ele, i);
 			moveNext(G->neighbors[i]);
@@ -265,9 +272,9 @@ Graph copyGraph(Graph G){
 		exit(EXIT_FAILURE);
 	}
 	Graph CPY = newGraph(getOrder(G));
-	for(int i = 1; i < getOrder(G); i++){
+	for(int i = 1; i <= getOrder(G); i++){
 		moveFront(G->neighbors[i]);
-		for(int j = 1; j < length(G->neighbors[i]); j++){
+		for(int j = 1; j <= length(G->neighbors[i]); j++){
 			int curr_ele = get(G->neighbors[i]);
 			addArc(CPY, i, curr_ele);
 			moveNext(G->neighbors[i]);
