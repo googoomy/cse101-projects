@@ -47,7 +47,7 @@ Graph newGraph(int n){
 	G->color = calloc(n+1, sizeof(int));
 	G->parent = calloc(n+1, sizeof(int));
 	G->discover = calloc(n+1, sizeof(int));
-	G->finish
+	G->finish = calloc(n+1, sizeof(int));
 	//initialize every list in neighbors[]
 	for(int i = 1; i <= n; i++){
 		G->neighbors[i] = newList();
@@ -73,7 +73,7 @@ void freeGraph(Graph* pG){
 		free((*pG)->color);
 		free((*pG)->parent);
 		free((*pG)->discover);
-		free((*pG)->finsih);
+		free((*pG)->finish);
 		free(*pG);
 		*pG = NULL;
 	}	
@@ -201,6 +201,23 @@ void addArc(Graph G, int u, int v){
 	G->size++;
 }
 
+void visit(Graph G, List S, int i, int* time){
+	G->discover[i] = ++(*time);
+	G->color[i] = GRAY;
+	moveFront(G->neighbors[i]);
+	for(int y = 1; y <= length(G->neighbors[i]); y++){
+		int curr_ele = get(G->neighbors[i]);
+		if(G->color[curr_ele] == WHITE){
+			G->parent[curr_ele] = i;
+			visit(G, S, curr_ele, time);
+		}
+		moveNext(G->neighbors[i]);
+	}	
+	G->color[i] = BLACK;
+	G->finish[i] = ++(*time);
+	prepend(S, i);
+}
+
 void DFS(Graph G, List S){
 	if(G == NULL){
 		fprintf(stderr, "Graph Error: calling DFS() on NULL Graph reference\n");
@@ -211,32 +228,15 @@ void DFS(Graph G, List S){
 		exit(EXIT_FAILURE);
 	}
 	for(int i = 1; i <= getOrder(G); i++){
-		color[i] = WHITE;
-		parent[i] = NIL;
+		G->color[i] = WHITE;
+		G->parent[i] = NIL;
 	}
 	int time = 0;
 	for(int i = 1; i <= getOrder(G); i++){
-		if(color[i] == WHITE){
+		if(G->color[i] == WHITE){
 			visit(G, S, i, &time);
 		}
 	}
-}
-
-void visit(Graph G, List S, int i, int* time){
-	G->discover[i] = ++(*time);
-	G->color[i] = GRAY;
-	moveFront(G->neighbors[i]);
-	for(int y = 1; y <= getOrder(i); y++){
-		int curr_ele = get(G->neighbors[i]);
-		if(color[curr_ele] == WHITE){
-			G->parent[curr_ele] = i;
-			visit(G, S, curr_ele, time);
-		}
-		moveNext(G->neighbors[i]);
-	}	
-	G->color[i] = BLACK;
-	G->finish[i] = ++(*time);
-	prepend(S, i);
 }
 
 /*** Other operations ***/
