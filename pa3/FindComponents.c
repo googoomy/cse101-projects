@@ -59,15 +59,18 @@ int main(int argc, char * argv[]){
 	fprintf(out, "Adjacency list representation of G:\n");
 	//print the contructed graph to the outfile
 	printGraph(out, G);
-	
+	//make the stack the same size as the order of G
 	List S = newList();
 	for(int i = 1; i <= getOrder(G); i++){
 		append(S, i);
 	}
+	//Run DFS on G and GT
 	DFS(G, S);
 	Graph GT = transpose(G);
 	DFS(GT, S);
+	//find the strong components
 	int strong_comps = 0;
+	//loop through to find out how many strong components there are
 	moveBack(S);
 	for(int i = 1; i <=getOrder(G); i++){
 		int curr_par = getParent(GT, get(S));
@@ -76,16 +79,18 @@ int main(int argc, char * argv[]){
 		}
 		movePrev(S);
 	}
-
+	//print the strong components to the outfile
 	fprintf(out, "G contains %d strongly connected components: \n", strong_comps);
-	/*
+	//loop through and print the list for each component
 	moveBack(S);
+	//temporary list of components to print out
 	List comps = newList();
 	for(int i = 1; i <= strong_comps; i++){
 		fprintf(out, "Component %d: ", i);
 		while(true){
 			prepend(comps, get(S));
 			int curr_par = getParent(GT, get(S));
+			//if parent is nil, then it is a strong comp
 			if(curr_par == NIL){
 				printList(out, comps);
 				fprintf(out, "\n");
@@ -95,41 +100,17 @@ int main(int argc, char * argv[]){
 			movePrev(S);
 		}
 		movePrev(S);
+		//reset the temporary list
 		clear(comps);
 	}
-	*/
-
-	int comps = 1;
-	moveBack(S);
-	for(int i = 1; i <= strong_comps; i++){
-		if(getParent(GT, get(S)) == NIL){
-			int ele = 1;
-			fprintf(out, "Component %d: %d", comps, get(S));
-			moveNext(S);
-			for(int j = 0; j <= length(S); j++){
-				fprintf(out, " %d", get(S));
-				ele++;
-				moveNext(S);
-			}
-			for(int k = 1; k < ele; k++){
-				deleteBack(S);
-			}
-			moveBack(S);
-			fprintf(out, "\n");
-			comps++;
-		}else{
-			movePrev(S);
-		}
-	}
-
+	
+	//frees and closing infile and outfile
 	fclose(in);
 	fclose(out);
 	freeGraph(&G);
 	freeGraph(&GT);
-	/*
 	clear(comps);
 	freeList(&comps);
-	*/
 	clear(S);
 	freeList(&S);
 }

@@ -1,7 +1,7 @@
 /******************************************************************
  *James Gu
  *jjgu
- *pa2
+ *pa3
  *
  *
  *
@@ -55,6 +55,9 @@ int main (){
 			printf("curr parent %d\n", getParent(GT, get(S)));
 		}
 		movePrev(S);
+	}
+	for(int i = 1; i < getOrder(G); i++){
+		
 	}
 	freeGraph(&G);
 	freeGraph(&GT);
