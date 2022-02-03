@@ -1,6 +1,12 @@
+#pragma once
+
+#include <stdio.h>
+#include "List.h"
+
+typedef struct MatrixObj *Matrix;
 // newMatrix()
 // Returns a reference to a new nXn Matrix object in the zero state.
-Matrix newMatrix(int n)
+Matrix newMatrix(int n);
 // freeMatrix()
 // Frees heap memory associated with *pM, sets *pM to NULL.
 void freeMatrix(Matrix* pM);
