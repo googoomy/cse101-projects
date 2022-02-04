@@ -14,7 +14,7 @@
 
 //structs
 typedef struct NodeObj{
-	int data;
+	void* data;
 	struct NodeObj* next;
 	struct NodeObj* prev;
 } NodeObj;
@@ -31,7 +31,7 @@ typedef struct ListObj{
 
 // Constructors-Destructors ---------------------------------------------------
 //This function creates a new Node
-Node newNode(int node_data){
+Node newNode(void* node_data){
 	Node N = malloc(sizeof(NodeObj));
 	N->data = node_data;
 	N->next = NULL;
@@ -87,7 +87,7 @@ int index(List L){ // Returns index of cursor element if defined, -1 otherwise.
 	return (L->idx);
 }
 
-int front(List L){ // Returns front element of L. Pre: length()>0
+void* front(List L){ // Returns front element of L. Pre: length()>0
 	if(L == NULL){
 		fprintf(stderr, "List Error: calling front() on NULL List reference\n");
 		exit(EXIT_FAILURE);
@@ -99,7 +99,7 @@ int front(List L){ // Returns front element of L. Pre: length()>0
 	return (L->front->data);
 }
 
-int back(List L){ // Returns back element of L. Pre: length()>0
+void* back(List L){ // Returns back element of L. Pre: length()>0
 	if(L == NULL){
 		fprintf(stderr, "List Error: calling back() on NULL List reference\n");
 		exit(EXIT_FAILURE);	
@@ -111,7 +111,7 @@ int back(List L){ // Returns back element of L. Pre: length()>0
 	return (L->back->data);
 }
 
-int get(List L){ // Returns cursor element of L. Pre: length()>0, index()>=0
+void* get(List L){ // Returns cursor element of L. Pre: length()>0, index()>=0
 	if(L == NULL){
 		fprintf(stderr, "List Error: calling get() on NULL List reference\n");
 		exit(EXIT_FAILURE);
@@ -121,39 +121,6 @@ int get(List L){ // Returns cursor element of L. Pre: length()>0, index()>=0
 		exit(EXIT_FAILURE); 
 	}
 	return (L->cursor->data);
-}
-
-bool equals(List A, List B){ // Returns true iff Lists A and B are in same
- // state, and returns false otherwise.
-	if(A == NULL){
-		fprintf(stderr, "List Error: calling equals() on NULL List reference\n");
-		exit(EXIT_FAILURE);
-	}
-	if(B == NULL){
-		fprintf(stderr, "List Error: calling equals() on NULL List reference\n");
-		exit(EXIT_FAILURE);
-	}
-	//if the lists are both 0 then they are equal
-	if(length(A) == 0 && length(B) == 0){
-		return true;
-	}
-	//if the length, front, or the backs are different then theya re not equal
-	if(length(A) != length(B) || front(A) != front(B) || back(A) != back(B)){
-		return false;
-	}
-	//loop through each list and check if all elements in between front and back are equal
-	Node NodA = A->front;
-	Node NodB = B->front;
-	bool isEqual = true;
-	for(int i = 0; i < length(A); i++){
-		if(NodA->data != NodB->data){
-			isEqual = false;
-			break;
-		}
-		NodA = NodA->next;
-		NodB = NodB->next;
-	}
-	return isEqual;
 }
 
  // Manipulation procedures ----------------------------------------------------
@@ -178,7 +145,7 @@ void clear(List L){ // Resets L to its original empty state.
 	L->idx = -1;
 }
 
-void set(List L, int x){ // Overwrites the cursor element’s data with x. 
+void set(List L, void* x){ // Overwrites the cursor element’s data with x. 
  // Pre: length()>0, index()>=0
 	if(L == NULL){
 		fprintf(stderr, "List Error: calling set() on NULL List reference\n");
@@ -301,7 +268,7 @@ void moveNext(List L){ // If cursor is defined and not at back, move cursor one
 	}
 }
 
-void prepend(List L, int x){ // Insert new element into L. If L is non-empty, 
+void prepend(List L, void* x){ // Insert new element into L. If L is non-empty, 
  // insertion takes place before front element.
 	Node Nod = newNode(x);
 	//if the List is empty then the front and back are the same
@@ -322,7 +289,7 @@ void prepend(List L, int x){ // Insert new element into L. If L is non-empty,
 	L->n++;
 }
 
-void append(List L, int x){ // Insert new element into L. If L is non-empty, 
+void append(List L, void* x){ // Insert new element into L. If L is non-empty, 
  // insertion takes place after back element.
 	Node Nod = newNode(x);
 	if(length(L) == 0){
@@ -338,7 +305,7 @@ void append(List L, int x){ // Insert new element into L. If L is non-empty,
 	L->n++;
 }
 
-void insertBefore(List L, int x){ // Insert new element before cursor. 
+void insertBefore(List L, void* x){ // Insert new element before cursor. 
  // Pre: length()>0, index()>=0
 	if(L == NULL){
 		fprintf(stderr, "List Error: calling insertBefore() on NULL List reference\n");
@@ -364,7 +331,7 @@ void insertBefore(List L, int x){ // Insert new element before cursor.
 	}
 }
 
-void insertAfter(List L, int x){ // Insert new element after cursor. 
+void insertAfter(List L, void* x){ // Insert new element after cursor. 
  // Pre: length()>0, index()>=0
 	if(L == NULL){
 		fprintf(stderr, "List Error: calling insertAfter() on NULL List reference\n");
@@ -516,24 +483,3 @@ void printList(FILE* out, List L){ // Prints to the file pointed to by out, a
 	}
 }
 
-List copyList(List L){ // Returns a new List representing the same integer 
- // sequence as L. The cursor in the new list is undefined,
-// regardless of the state of the cursor in L. The state 
-// of L is unchanged.
-	if(L == NULL){
-		fprintf(stderr, "List Error calling copyList() on NULL List reference\n");
-		exit(EXIT_FAILURE);
-	}
-	//if the list is empty then return an empty list
-	if(length(L) == 0){
-		List R = newList();
-		return R;
-	}
-	//loop through the list and add each node to the new list
-	Node Nod = NULL;
-	List R = newList();
-	for(Nod = L->front; Nod != NULL; Nod = Nod->next){
-		append(R, Nod->data);
-	}
-	return R;
-}
