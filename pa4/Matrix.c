@@ -1,6 +1,43 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include "Matrix.h"
+#include "List.h"
+
+typedef struct EntryObj{
+	int col;
+	double value;
+}EntryObj;
+
+typedef EntryObj* Entry;
+
+typedef struct MatrixObj{
+	List *rows;
+	int size;
+	int nnz;
+}MatrixObj;
+
+Entry newEntry(int col_num, double val){
+	Entry E = malloc(sizeof(EntryObj));
+	E->col = col_num;
+	E->value = val;
+	return(E);
+}
+
+/*
+void freeEntry(Entry *pE){
+	if(pE != NULL && *pE != NULL){
+		free(*pE);
+		*pE = NULL;
+	}
+}
+*/
+
 // newMatrix()
 // Returns a reference to a new nXn Matrix object in the zero state.
-Matrix newMatrix(int n)
+Matrix newMatrix(int n){
+	
+}
 // freeMatrix()
 // Frees heap memory associated with *pM, sets *pM to NULL.
 void freeMatrix(Matrix* pM);
