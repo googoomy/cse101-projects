@@ -186,23 +186,158 @@ void changeEntry(Matrix M, int i, int j, double x){
 // copy()
 // Returns a reference to a new Matrix object having the same entries as A.
 Matrix copy(Matrix A){
+	if(A == NULL){
+		return NULL;
+	}
+	Matrix CPY = newMatrix(size(A));
+	for(int i = 1; i <= size(A); i++){
+		moveFront(A->rows[i]);
+		while(index(A->rows[i]) != -1){
+			Entry curr_entry = get(A->rows[i]);
+			changeEntry(CPY, i, curr_entry->col, curr_entry->value);
+			moveNext(A->rows[i]);
+		}	
+	}
+	return CPY;
 	
 }
 // transpose()
 // Returns a reference to a new Matrix object representing the transpose
 // of A.
-Matrix transpose(Matrix A);
+Matrix transpose(Matrix A){
+	if(A == NULL){
+		return NULL;
+	}
+	Matrix TP = newMatrix(size(A));
+	for(int i = 1; i <= size(A); i++){
+		moveFront(A->rows[i]);
+		while(index(A->rows[i]) != -1){
+			Entry curr_entry = get(A->rows[i]);
+			changeEntry(TP, curr_entry->col, i, curr_entry->value);
+			moveNext(A->rows[i]);
+		}	
+	}
+	return TP
+	
+}
 // scalarMult()
 // Returns a reference to a new Matrix object representing xA.
-Matrix scalarMult(double x, Matrix A);
+Matrix scalarMult(double x, Matrix A){
+	if(A == NULL){
+		return NULL;
+	}
+	Matrix SM = newMatrix(size(A));
+	if(x == 0.0){
+		makeZero(SM);
+		return SM;
+	}
+	for(int i = 1; i <= size(A); i++){
+		moveFront(A->rows[i]);
+		while(index(A->rows[i]) != -1){
+			Entry curr_entry = get(A->rows[i]);
+			changeEntry(SM, i, curr_entry->col, (x*(curr_entry->value)));
+			moveNext(A->rows[i]);
+		}	
+	}
+	return SM;
+}
 // sum()
 // Returns a reference to a new Matrix object representing A+B.
 // pre: size(A)==size(B)
-Matrix sum(Matrix A, Matrix B);
+Matrix sum(Matrix A, Matrix B){
+	if(A == NULL || B == NULL){
+		fprintf(stderr, "Matrix Error: calling sum() on NULL Matrix reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(size(A) != size(B)){
+		fprintf(stderr, "Matrix Error: calling sum() with matrices of different sizes\n");
+		exit(EXIT_FAILURE);
+	}
+	Matrix SumM = newMatrix(size(A));
+	for(int i = 1; i <= size(A); i++){
+		List LA = A->rows[i];
+		List LB = B->rows[i];
+		moveFront(LA);
+		moveFront(LB);
+		while(index(LA) != -1 || index(LB)){
+			Entry curr_A = get(LA);
+			Entry curr_B = get(LB);
+			if(index(LA) != -1 && index(LB) != -1){
+				if(curr_A->col == curr_B->col){
+					//if cols are alligned
+					changeEntry(SumM, i, curr_A->col, curr_A->value + curr_B->value);
+					moveNext(LA);
+					moveNext(LB);
+				}else if(curr_A->col > curr_B->col){
+					//catch up
+					changeEntry(SumM, i, curr_B->col, curr_B->value);
+					moveNext(LB);	
+				}else{
+					//catch up
+					changeEntry(SumM, i, curr_A->col, curr_A->value);
+					moveNext(LA);
+				}
+			}else if(index(LB) == -1 && index(LA) != -1){
+				changeEntry(SumM, i, curr_A->col, curr_A->value);
+				moveNext(LA);
+			}else{
+				changeEntry(SumM,i, curr_B->col, curr_B->value);
+				moveNext(LB);	
+			}
+			
+		}
+	}
+	return SumM;	
+
+}
 // diff()
 // Returns a reference to a new Matrix object representing A-B.
 // pre: size(A)==size(B)
-Matrix diff(Matrix A, Matrix B);
+Matrix diff(Matrix A, Matrix B){
+	if(A == NULL || B == NULL){
+		fprintf(stderr, "Matrix Error: calling diff() on NULL Matrix reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(size(A) != size(B)){
+		fprintf(stderr, "Matrix Error: calling diff() with matrices of different sizes\n");
+		exit(EXIT_FAILURE);
+	}
+	Matrix DiffM = newMatrix(size(A));
+	for(int i = 1; i <= size(A); i++){
+		List LA = A->rows[i];
+		List LB = B->rows[i];
+		moveFront(LA);
+		moveFront(LB);
+		while(index(LA) != -1 || index(LB)){
+			Entry curr_A = get(LA);
+			Entry curr_B = get(LB);
+			if(index(LA) != -1 && index(LB) != -1){
+				if(curr_A->col == curr_B->col){
+					//if cols are alligned
+					changeEntry(DiffM, i, curr_A->col, curr_A->value - curr_B->value);
+					moveNext(LA);
+					moveNext(LB);
+				}else if(curr_A->col > curr_B->col){
+					//catch up
+					changeEntry(DiffM, i, curr_B->col, 0.0-curr_B->value);
+					moveNext(LB);	
+				}else{
+					//catch up
+					changeEntry(DiffM, i, curr_A->col, curr_A->value);
+					moveNext(LA);
+				}
+			}else if(index(LB) == -1 && index(LA) != -1){
+				changeEntry(DiffM, i, curr_A->col, curr_A->value);
+				moveNext(LA);
+			}else{
+				changeEntry(DiffM,i, curr_B->col, 0.0-curr_B->value);
+				moveNext(LB);	
+			}
+			
+		}
+	}
+	return DiffM;	
+}
 // product()
 // Returns a reference to a new Matrix object representing AB
 // pre: size(A)==size(B)
