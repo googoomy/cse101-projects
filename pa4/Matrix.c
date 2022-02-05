@@ -24,14 +24,14 @@ Entry newEntry(int col_num, double val){
 	return(E);
 }
 
-/*
+
 void freeEntry(Entry *pE){
 	if(pE != NULL && *pE != NULL){
 		free(*pE);
 		*pE = NULL;
 	}
 }
-*/
+
 
 // newMatrix()
 // Returns a reference to a new nXn Matrix object in the zero state.
@@ -84,19 +84,110 @@ int NNZ(Matrix M){
 
 // equals()
 // Return true (1) if matrices A and B are equal, false (0) otherwise.
-int equals(Matrix A, Matrix B);
+int equals(Matrix A, Matrix B){
+	if(size(A) != size(B)){
+		return 0;
+	}
+	if(NNZ(A) != NNZ(B)){
+		return 0;
+	}
+	if(size(A) == 0 && size(B) == 0){
+		return 1;
+	}
+	if(A == NULL && B == NULL){
+		return 1;
+	}
+	for(int i = 1; i <= size(A); i++){
+		moveFront(A->rows[i]);
+		moveFront(B->rows[i]);
+		if(length(A->rows[i]) != length(B->rows[i])){
+			return 0;
+		}
+		while(index(A->rows[i]) != -1 && index(B->rows[i]) != -1){
+			Entry EA = get(A->rows[i]);
+			Entry EB = get(B->rows[i]);
+			if(EA->value != EB->value && EA->col == EB->col){
+				return 0;
+			}
+			if(EA->col != EB->col){
+				return 0;
+			}
+			moveNext(A->rows[i]);
+			moveNext(B->rows[i]);
+		}
+	}
+	return 1;
+}
+
 // Manipulation procedures 
 // makeZero()
 // Re-sets M to the zero Matrix state.
-void makeZero(Matrix M);
+void makeZero(Matrix M){
+	for(int i = 1; i <= size(M); i++){
+		clear(M->rows[i]);
+	}
+	M->size = 0;
+	M->nnz = 0;
+}
+
 // changeEntry()
 // Changes the ith row, jth column of M to the value x.
 // Pre: 1<=i<=size(M), 1<=j<=size(M)
-void changeEntry(Matrix M, int i, int j, double x);
+void changeEntry(Matrix M, int i, int j, double x){
+	if(M == NULL){
+		fprintf(stderr, "Matrix Error: calling changeEntry() on NULL Matrix reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(i < 1 || i > size(M)){
+		fprintf(stderr, "Matrix Error: calling changeEntry() with invalid row. Row must be 1<=i<=size(M)\n");
+		exit(EXIT_FAILURE);
+	}
+	if(j < 1 || j > size(M)){
+		fprintf(stderr, "Matrix Error: calling changeEntry() with invalid column. Comlumn must be 1<=j<=size(M)\n");
+		exit(EXIT_FAILURE);
+	}
+	Entry E = newEntry(j, x);
+	List L = M->rows[i];
+	
+	if(length(L) == 0){
+		if(x != 0.0){
+			append(L, E);
+			M->nnz++;
+			return;
+		}
+	}
+
+	moveFront(L);
+	while(index(L) != -1){
+		Entry curr_entry = get(M->rows[i]);
+		if(curr_entry->col == j && x == 0.0){
+			freeEntry(&E);
+			delete(L);
+			M->nnx--;
+			return;
+		}	
+		if(curr_entry->col == j && x != 0.0){
+			insertBefore(L, E);
+			M->nnz++;
+			return;
+		}
+		if(curr_entry->col < j){
+			insertBefore(L, E);
+			M->nnz++;
+			return;	
+		}	
+
+		moveNext(L);
+	}
+	
+}
+
 // Matrix Arithmetic operations 
 // copy()
 // Returns a reference to a new Matrix object having the same entries as A.
-Matrix copy(Matrix A);
+Matrix copy(Matrix A){
+	
+}
 // transpose()
 // Returns a reference to a new Matrix object representing the transpose
 // of A.
