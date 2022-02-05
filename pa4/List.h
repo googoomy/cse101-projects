@@ -27,8 +27,6 @@ int index(List L); // Returns index of cursor element if defined, -1 otherwise.
 void* front(List L); // Returns front element of L. Pre: length()>0
 void* back(List L); // Returns back element of L. Pre: length()>0
 void* get(List L); // Returns cursor element of L. Pre: length()>0, index()>=0
-bool equals(List A, List B); // Returns true iff Lists A and B are in same
- // state, and returns false otherwise.
 // Manipulation procedures ----------------------------------------------------
 void clear(List L); // Resets L to its original empty state.
 void set(List L, void* x); // Overwrites the cursor element’s data with x. 
@@ -59,7 +57,7 @@ void deleteBack(List L); // Delete the back element. Pre: length()>0
 void delete(List L); // Delete cursor element, making cursor undefined.
  // Pre: length()>0, index()>=0
 // Other operations -----------------------------------------------------------
-void printList(FILE* out, List L); // Prints to the file pointed to by out, a 
+//void printList(FILE* out, List L); // Prints to the file pointed to by out, a 
  // string representation of L consisting 
  // of a space separated sequence of integers,
 // with front on left.

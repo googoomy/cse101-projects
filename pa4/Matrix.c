@@ -163,7 +163,7 @@ void changeEntry(Matrix M, int i, int j, double x){
 		if(curr_entry->col == j && x == 0.0){
 			freeEntry(&E);
 			delete(L);
-			M->nnx--;
+			M->nnz--;
 			return;
 		}	
 		if(curr_entry->col == j && x != 0.0){
@@ -343,6 +343,8 @@ double vectorDot(List P, List Q){
 	double dot_sum;
 	moveFront(P);
 	moveFront(Q);
+	Entry curr_P;
+	Entry curr_Q;
 	while(index(P) != -1 || index(Q) != -1){
 		if(index(P) != -1 && index(Q) != -1){
 			curr_P = get(P);
@@ -351,7 +353,7 @@ double vectorDot(List P, List Q){
 				dot_sum += curr_P->value * curr_Q->value;
 				moveNext(P);
 				moveNext(Q);
-			}else if(curr_P->col > curr_P->col){
+			}else if(curr_P->col > curr_Q->col){
 				moveNext(Q);
 			}else{
 				moveNext(P);
@@ -382,7 +384,7 @@ Matrix product(Matrix A, Matrix B){
 	Matrix TP = transpose(B);
 	for(int i = 1; i <= size(A); i++){
 		for(int j = 1; j <= size(A); j++){
-			double dot_sum = vector(A->rows[i], TP->rows[i]);
+			double dot_sum = vectorDot(A->rows[i], TP->rows[i]);
 			changeEntry(PD, i, j, dot_sum);
 		}
 	}
@@ -405,13 +407,14 @@ void printMatrix(FILE* out, Matrix M){
 				fprintf(out, "%d: ", i);		
 		}
 		while(index(M->rows[i]) != -1){
-			curr_entry = get(M->rows[i]);
+			Entry curr_entry = get(M->rows[i]);
 			fprintf(out, "(%d, %.1f) ", curr_entry->col,curr_entry->value);
 			moveNext(M->rows[i]);
 		}	
 		if(i >= 1 && index(M->rows[i]) != -1){
 			fprintf(out, "\n");			
 		}
+	}
 }
 
 
