@@ -198,7 +198,7 @@ Matrix copy(Matrix A){
 			moveNext(A->rows[i]);
 		}	
 	}
-	return CPY;
+	return(CPY);
 	
 }
 // transpose()
@@ -217,7 +217,7 @@ Matrix transpose(Matrix A){
 			moveNext(A->rows[i]);
 		}	
 	}
-	return TP
+	return(TP);
 	
 }
 // scalarMult()
@@ -239,7 +239,7 @@ Matrix scalarMult(double x, Matrix A){
 			moveNext(A->rows[i]);
 		}	
 	}
-	return SM;
+	return(SM);
 }
 // sum()
 // Returns a reference to a new Matrix object representing A+B.
@@ -287,7 +287,7 @@ Matrix sum(Matrix A, Matrix B){
 			
 		}
 	}
-	return SumM;	
+	return(SumM);	
 
 }
 // diff()
@@ -336,16 +336,85 @@ Matrix diff(Matrix A, Matrix B){
 			
 		}
 	}
-	return DiffM;	
+	return(DiffM);	
 }
+
+double vectorDot(List P, List Q){
+	double dot_sum;
+	moveFront(P);
+	moveFront(Q);
+	while(index(P) != -1 || index(Q) != -1){
+		if(index(P) != -1 && index(Q) != -1){
+			curr_P = get(P);
+			curr_Q = get(Q);
+			if(curr_P->col == curr_Q->col){
+				dot_sum += curr_P->value * curr_Q->value;
+				moveNext(P);
+				moveNext(Q);
+			}else if(curr_P->col > curr_P->col){
+				moveNext(Q);
+			}else{
+				moveNext(P);
+			}
+		}else if(index(Q) == -1 && index(P) != -1){
+			moveNext(P);
+		}else{
+			moveNext(Q);
+		}
+	}
+	return dot_sum;
+
+}
+
 // product()
 // Returns a reference to a new Matrix object representing AB
 // pre: size(A)==size(B)
-Matrix product(Matrix A, Matrix B);
+Matrix product(Matrix A, Matrix B){
+	if(A == NULL || B == NULL){
+		fprintf(stderr, "Matrix Error: calling product() on NULL Matrix reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if(size(A) != size(B)){
+		fprintf(stderr, "Matrix Error: calling product() with matrices of different sizes\n");
+		exit(EXIT_FAILURE);
+	}
+	Matrix PD = newMatrix(size(A));
+	Matrix TP = transpose(B);
+	for(int i = 1; i <= size(A); i++){
+		for(int j = 1; j <= size(A); j++){
+			double dot_sum = vector(A->rows[i], TP->rows[i]);
+			changeEntry(PD, i, j, dot_sum);
+		}
+	}
+	return(PD);
+}
 // printMatrix()
 // Prints a string representation of Matrix M to filestream out. Zero rows 
 // are not printed. Each non-zero row is represented as one line consisting 
 // of the row number, followed by a colon, a space, then a space separated 
 // list of pairs "(col, val)" giving the column numbers and non-zero values 
 // in that row. The double val will be rounded to 1 decimal point.
-void printMatrix(FILE* out, Matrix M);
+void printMatrix(FILE* out, Matrix M){
+	if(M == NULL){
+		fprintf(stderr, "Matrix Error: calling printMatrix() on NULL Matrix reference\n");
+		exit(EXIT_FAILURE);
+	}
+	for(int i = 1; i < size(M); i++){
+		moveFront(M->rows[i]);
+		if(index(M->rows[i]) != -1){
+				fprintf(out, "%d: ", i);		
+		}
+		while(index(M->rows[i]) != -1){
+			curr_entry = get(M->rows[i]);
+			fprintf(out, "(%d, %.1f) ", curr_entry->col,curr_entry->value);
+			moveNext(M->rows[i]);
+		}	
+		if(i >= 1 && index(M->rows[i]) != -1){
+			fprintf(out, "\n");			
+		}
+}
+
+
+
+
+
