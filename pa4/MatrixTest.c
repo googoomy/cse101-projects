@@ -29,12 +29,38 @@ int main(){
 	printMatrix(stdout, N);
 	printf("\n%d\n",nnz_N);
 	
+	printf("sum:\n");
 	Matrix sumM = sum(M, M);
 	printMatrix(stdout, sumM);
 	
+	printf("sum:\n");
 	Matrix sumN = sum(M, N);
 	printMatrix(stdout, sumN);
-
+	
+	printf("diff:\n");
 	Matrix diffM = diff(N, M);
 	printMatrix(stdout, diffM);
+	
+	printf("transpose:\n");
+	Matrix transM = transpose(M);
+	printMatrix(stdout, transM);
+
+	printf("product:\n");
+	Matrix prodM = product(M, N);
+	printMatrix(stdout, prodM);
+	
+	printf("product:\n");
+	Matrix prodN = product(N, N);
+	printMatrix(stdout, prodN);
+
+	freeMatrix(&M);
+	freeMatrix(&N);
+	freeMatrix(&sumM);
+	freeMatrix(&sumN);
+	freeMatrix(&diffM);
+	freeMatrix(&transM);
+	freeMatrix(&prodM);
+	freeMatrix(&prodN);
+
+
 }

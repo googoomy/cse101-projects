@@ -37,7 +37,7 @@ void freeEntry(Entry *pE){
 // Returns a reference to a new nXn Matrix object in the zero state.
 Matrix newMatrix(int n){
 	Matrix M = malloc(sizeof(MatrixObj));
-	M->rows = malloc(sizeof(List) * n);
+	M->rows = (List*)calloc(n+1, sizeof(List));
 	for(int i = 1; i <= n; i++){
 		M->rows[i] = newList();
 	}
@@ -51,7 +51,20 @@ void freeMatrix(Matrix* pM){
 	if(pM != NULL && *pM != NULL){
 		/*
 		makeZero(*pM);
-		for(int i = 0; i < size(*pM); i++){
+		for(int i = 1; i <= size(*pM); i++){
+			freeList(&((*pM)->rows[i]));
+		}
+		free((*pM)->rows);
+		*/
+		/*
+		for(int i = 1; i <= size(*pM); i++){
+			moveFront((*pM)->rows[i]);
+			while(index((*pM)->rows[i]) != -1){
+				freeEntry(get((*pM)->rows[i]));
+				moveNext((*pM)->rows[i]);
+			}	
+		}
+		for(int i = 1; i<= size(*pM); i++){
 			freeList(&((*pM)->rows[i]));
 		}
 		free((*pM)->rows);
@@ -59,7 +72,6 @@ void freeMatrix(Matrix* pM){
 		free(*pM);
 		*pM = NULL;
 	}
-	
 }
 
 // Access functions 
@@ -170,7 +182,9 @@ void changeEntry(Matrix M, int i, int j, double x){
 		}
 		if(curr_entry->col == j){
 			if(x == 0){
-				freeEntry(&E);
+				//freeEntry(&E);
+				//freeEntry(&curr_entry);
+				free(M->rows[i]);
 				delete(L);
 				M->nnz--;
 				return;
@@ -312,7 +326,6 @@ Matrix sum(Matrix A, Matrix B){
 		Entry curr_B;
 		while(index(LA) != -1 || index(LB) != -1){
 			if(index(LA) != -1 && index(LB) != -1){
-			//if(index(LA) >= 0 && index(LB) >= 0){
 				curr_A = get(LA);
 				curr_B = get(LB);
 				if(curr_A->col == curr_B->col){
@@ -330,16 +343,11 @@ Matrix sum(Matrix A, Matrix B){
 					moveNext(LA);
 				}
 			}else if(index(LB) == -1 && index(LA) != -1){
-			//}else if(index(LA) >= 0){	
-				while(index(LA) != -1){
 					changeEntry(SumM, i, curr_A->col, curr_A->value);
 					moveNext(LA);
-				}
 			}else{
-				while(index(LB) != -1){
 					changeEntry(SumM,i, curr_B->col, curr_B->value);
 					moveNext(LB);	
-				}
 			}
 		}
 	}
@@ -377,11 +385,11 @@ Matrix diff(Matrix A, Matrix B){
 					moveNext(LA);
 					moveNext(LB);
 				}else if(curr_A->col > curr_B->col){
-					//catch up
+					//when 0
 					changeEntry(DiffM, i, curr_B->col, 0.0-curr_B->value);
 					moveNext(LB);	
 				}else{
-					//catch up
+					//when 0
 					changeEntry(DiffM, i, curr_A->col, curr_A->value);
 					moveNext(LA);
 				}
@@ -397,36 +405,73 @@ Matrix diff(Matrix A, Matrix B){
 	}
 	return(DiffM);	
 }
-
+/*
 double vectorDot(List P, List Q){
+	
 	double dot_sum;
 	moveFront(P);
 	moveFront(Q);
 	Entry curr_P;
 	Entry curr_Q;
-	while(index(P) != -1 || index(Q) != -1){
+	while(index(P) != -1 && index(Q) != -1){
 		if(index(P) != -1 && index(Q) != -1){
 			curr_P = get(P);
 			curr_Q = get(Q);
-			if(curr_P->col == curr_Q->col){
-				dot_sum += curr_P->value * curr_Q->value;
-				moveNext(P);
-				moveNext(Q);
-			}else if(curr_P->col > curr_Q->col){
-				moveNext(Q);
-			}else{
-				moveNext(P);
-			}
-		}else if(index(Q) == -1 && index(P) != -1){
+		}
+		if(curr_P->col == curr_Q->col){
+			dot_sum += curr_P->value * curr_Q->value;
 			moveNext(P);
-		}else{
 			moveNext(Q);
+		}else if(curr_P->col > curr_Q->col){
+			moveNext(Q);
+		}else{
+			moveNext(P);
 		}
 	}
 	return dot_sum;
-
+	
+	
+	double dot_sum;
+	moveFront(P);
+	moveFront(Q);
+	Entry curr_P;
+	Entry curr_Q;
+	//for(int i = 1; i <= length(P); i++){
+	while(index(P) != -1 || index(Q) != -1){
+		
+		//if(index(P) != -1){
+		//	curr_P = get(P);
+		//}
+		//if(index(Q) != -1){
+		//	curr_Q = get(Q);
+		//}
+		
+		if(index(P) != -1 && index(Q) != -1){
+		//if(index(P) >= 0 && index(Q) >= 0){
+			curr_P = get(P);
+			curr_Q = get(Q);
+			if(curr_P->col == curr_Q->col){
+				dot_sum += (curr_P->value * curr_Q->value);
+				moveNext(Q);
+				moveNext(P);
+			}
+			if(curr_P->col > curr_Q->col){
+				moveNext(Q);
+			}
+			if(curr_Q->col < curr_P->col){
+				moveNext(P);
+			}
+		}else if(index(P) == -1 && index(Q) != -1 ){
+		//}else if(index(Q)>=0){	
+			moveNext(Q);
+		}else{
+			moveNext(P);
+		}
+	}
+	return dot_sum;
+	
 }
-
+*/
 // product()
 // Returns a reference to a new Matrix object representing AB
 // pre: size(A)==size(B)
@@ -439,14 +484,102 @@ Matrix product(Matrix A, Matrix B){
 		fprintf(stderr, "Matrix Error: calling product() with matrices of different sizes\n");
 		exit(EXIT_FAILURE);
 	}
+/*
 	Matrix PD = newMatrix(size(A));
 	Matrix TP = transpose(B);
 	for(int i = 1; i <= size(A); i++){
 		for(int j = 1; j <= size(A); j++){
 			double dot_sum = vectorDot(A->rows[i], TP->rows[i]);
-			changeEntry(PD, i, j, dot_sum);
+			if(dot_sum != 0){
+				changeEntry(PD, i, j, dot_sum);
+		
+			}
 		}
 	}
+	return(PD);
+	*/
+
+/*	
+	Matrix PD = newMatrix(size(A));
+	Matrix TP = transpose(B);
+	double dot_sum = 0;
+	List LA;
+	List LB;
+	Entry curr_A;
+	Entry curr_B;
+	for(int i = 1; i <= size(A); i++){
+		LA = A->rows[i];
+		moveFront(LA);
+		for(int j = 1; j <= size(A); j++){
+			LB = TP->rows[j];
+			moveFront(LB);
+			while(index(LA) != -1 || index(LB) != -1){
+				if(index(LA) != -1 && index(LB) != -1){
+					curr_A = get(LA);
+					curr_B = get(LB);
+				
+					if(curr_A->col == curr_B->col){
+						dot_sum += (curr_A->value * curr_B->value);
+						moveNext(LA);
+						moveNext(LB);
+					}else if(curr_A->col > curr_B->col){
+						moveNext(LB);
+					}else{
+						moveNext(LA);
+					}
+				}else if(index(LB) == -1 && index(LA) != -1){
+					moveNext(LA);
+				}
+				else{
+					moveNext(LB);
+				}
+			}
+			if(dot_sum != 0){
+				changeEntry(PD, i, j, dot_sum);
+				dot_sum = 0;
+			}
+			moveFront(LA);
+		}
+	}
+	freeMatrix(&TP);
+	return(PD);
+*/
+	Matrix PD = newMatrix(size(A));
+	Matrix TP = transpose(B);
+	double dot_sum = 0;
+	List LA;
+	List LB;
+	Entry curr_A;
+	Entry curr_B;
+	for(int i = 1; i <= size(A); i++){
+		LA = A->rows[i];
+		moveFront(LA);
+		for(int j = 1; j <= size(A); j++){
+			LB = TP->rows[j];
+			moveFront(LB);
+			while(index(LA) != -1 && index(LB) != -1){
+				curr_A = get(LA);
+				curr_B = get(LB);
+			
+				if(curr_A->col == curr_B->col){
+					dot_sum += (curr_A->value * curr_B->value);
+					moveNext(LA);
+					moveNext(LB);
+				}else if(curr_A->col > curr_B->col){
+					moveNext(LB);
+				}else{
+					moveNext(LA);
+				}
+
+			}
+			if(dot_sum != 0){
+				changeEntry(PD, i, j, dot_sum);
+			}
+			dot_sum = 0;
+			moveFront(LA);
+		}
+	}
+	freeMatrix(&TP);
 	return(PD);
 }
 // printMatrix()
