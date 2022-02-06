@@ -159,12 +159,18 @@ void changeEntry(Matrix M, int i, int j, double x){
 			return;
 		}
 	}
-
+	
+	Entry curr_entry = NULL;
 	moveFront(L);
 	for(int k = 1; k <= length(L); k++){
-		Entry curr_entry = get(L);
+		if(length(L) != 0){
+			curr_entry = get(L);
+		}else{
+			curr_entry = NULL;
+		}
 		if(curr_entry->col == j){
 			if(x == 0){
+				freeEntry(&E);
 				delete(L);
 				M->nnz--;
 				return;
@@ -293,17 +299,22 @@ Matrix sum(Matrix A, Matrix B){
 		fprintf(stderr, "Matrix Error: calling sum() with matrices of different sizes\n");
 		exit(EXIT_FAILURE);
 	}
-	printf("sum");
+	if(equals(A,B) == 1){
+		return scalarMult(2.0, A);		
+	}
 	Matrix SumM = newMatrix(size(A));
 	for(int i = 1; i <= size(A); i++){
 		List LA = A->rows[i];
 		List LB = B->rows[i];
 		moveFront(LA);
 		moveFront(LB);
-		while(index(LA) != -1 || index(LB)){
-			Entry curr_A = get(LA);
-			Entry curr_B = get(LB);
+		Entry curr_A;
+		Entry curr_B;
+		while(index(LA) != -1 || index(LB) != -1){
 			if(index(LA) != -1 && index(LB) != -1){
+			//if(index(LA) >= 0 && index(LB) >= 0){
+				curr_A = get(LA);
+				curr_B = get(LB);
 				if(curr_A->col == curr_B->col){
 					//if cols are alligned
 					changeEntry(SumM, i, curr_A->col, curr_A->value + curr_B->value);
@@ -319,13 +330,17 @@ Matrix sum(Matrix A, Matrix B){
 					moveNext(LA);
 				}
 			}else if(index(LB) == -1 && index(LA) != -1){
-				changeEntry(SumM, i, curr_A->col, curr_A->value);
-				moveNext(LA);
+			//}else if(index(LA) >= 0){	
+				while(index(LA) != -1){
+					changeEntry(SumM, i, curr_A->col, curr_A->value);
+					moveNext(LA);
+				}
 			}else{
-				changeEntry(SumM,i, curr_B->col, curr_B->value);
-				moveNext(LB);	
+				while(index(LB) != -1){
+					changeEntry(SumM,i, curr_B->col, curr_B->value);
+					moveNext(LB);	
+				}
 			}
-			
 		}
 	}
 	return(SumM);	
@@ -349,10 +364,13 @@ Matrix diff(Matrix A, Matrix B){
 		List LB = B->rows[i];
 		moveFront(LA);
 		moveFront(LB);
-		while(index(LA) != -1 || index(LB)){
-			Entry curr_A = get(LA);
-			Entry curr_B = get(LB);
+		Entry curr_A;
+		Entry curr_B;
+		while(index(LA) != -1 || index(LB) != -1){
 			if(index(LA) != -1 && index(LB) != -1){
+				curr_A = get(LA);
+				curr_B = get(LB);
+
 				if(curr_A->col == curr_B->col){
 					//if cols are alligned
 					changeEntry(DiffM, i, curr_A->col, curr_A->value - curr_B->value);
