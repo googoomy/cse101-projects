@@ -146,7 +146,10 @@ void changeEntry(Matrix M, int i, int j, double x){
 		fprintf(stderr, "Matrix Error: calling changeEntry() with invalid column. Comlumn must be 1<=j<=size(M)\n");
 		exit(EXIT_FAILURE);
 	}
-	Entry E = newEntry(j, x);
+	Entry E = NULL;
+	if(x != 0.0){
+		E = newEntry(j, x);
+	}
 	List L = M->rows[i];
 	
 	if(length(L) == 0){
@@ -158,6 +161,36 @@ void changeEntry(Matrix M, int i, int j, double x){
 	}
 
 	moveFront(L);
+	for(int k = 1; k <= length(L); k++){
+		Entry curr_entry = get(L);
+		if(curr_entry->col == j){
+			if(x == 0){
+				delete(L);
+				M->nnz--;
+				return;
+			}
+			else{
+				curr_entry->value = x;
+				return;
+			}
+		}else if(curr_entry->col > j){
+			if(x != 0){
+				insertBefore(L, E);
+				M->nnz++;
+			}
+			return;
+		}else if(k == length(L)){
+			if(x != 0){
+				insertAfter(L, E);
+				M->nnz++;
+			}
+			return;
+		}
+		moveNext(L);
+	}
+
+	/*
+	moveFront(L);
 	while(index(L) != -1){
 		Entry curr_entry = get(M->rows[i]);
 		if(curr_entry->col == j && x == 0.0){
@@ -166,20 +199,27 @@ void changeEntry(Matrix M, int i, int j, double x){
 			M->nnz--;
 			return;
 		}	
-		if(curr_entry->col == j && x != 0.0){
+		else if(curr_entry->col == j && x != 0.0){
+			
 			insertBefore(L, E);
 			M->nnz++;
+			
+			curr_entry->value = x;
 			return;
 		}
-		if(curr_entry->col < j){
+		else if(curr_entry->col < j){
 			insertBefore(L, E);
 			M->nnz++;
 			return;	
 		}	
-
+		else if(index(L) == length(L)){
+			//insertAfter(L, E);
+			//M->nnz++;
+		}
 		moveNext(L);
 	}
-	
+	*/
+
 }
 
 // Matrix Arithmetic operations 
@@ -253,6 +293,7 @@ Matrix sum(Matrix A, Matrix B){
 		fprintf(stderr, "Matrix Error: calling sum() with matrices of different sizes\n");
 		exit(EXIT_FAILURE);
 	}
+	printf("sum");
 	Matrix SumM = newMatrix(size(A));
 	for(int i = 1; i <= size(A); i++){
 		List LA = A->rows[i];
@@ -401,23 +442,45 @@ void printMatrix(FILE* out, Matrix M){
 		fprintf(stderr, "Matrix Error: calling printMatrix() on NULL Matrix reference\n");
 		exit(EXIT_FAILURE);
 	}
-	for(int i = 1; i < size(M); i++){
+/*
+	for(int i = 1; i <= size(M); i++){
 		moveFront(M->rows[i]);
 		if(index(M->rows[i]) != -1){
-				fprintf(out, "%d: ", i);		
+			if(i != 1){
+				fprintf(out, "\n");
+			}	
+			fprintf(out, "%d: ", i);		
 		}
 		while(index(M->rows[i]) != -1){
 			Entry curr_entry = get(M->rows[i]);
-			fprintf(out, "(%d, %.1f) ", curr_entry->col,curr_entry->value);
+			fprintf(out, "(%d, %.1f) ", curr_entry->col, curr_entry->value);
 			moveNext(M->rows[i]);
 		}	
 		if(i >= 1 && index(M->rows[i]) != -1){
 			fprintf(out, "\n");			
 		}
 	}
+
+*/
+
+	List L;
+	for(int i = 1; i <= size(M); i++){
+		L = M->rows[i];
+		moveFront(L);
+		//Entry curr_entry = get(L);
+		for(int j = 1; j <= length(L); j++){
+			Entry curr_entry = get(L);
+			if (j == 1){
+				fprintf(out, "%d: ", i);
+			}
+			fprintf(out, "(%d, %.1f) ", curr_entry->col, curr_entry->value);
+			if(j == length(L)){
+				fprintf(out, "\n");
+			}
+			moveNext(L);
+		}
+	}
+	
 }
-
-
-
 
 
