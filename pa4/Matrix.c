@@ -37,7 +37,7 @@ void freeEntry(Entry *pE){
 // Returns a reference to a new nXn Matrix object in the zero state.
 Matrix newMatrix(int n){
 	Matrix M = malloc(sizeof(MatrixObj));
-	M->rows = (List*)calloc(n+1, sizeof(List));
+	M->rows = calloc(n+1, sizeof(List));
 	for(int i = 1; i <= n; i++){
 		M->rows[i] = newList();
 	}
@@ -497,8 +497,8 @@ Matrix product(Matrix A, Matrix B){
 		}
 	}
 	return(PD);
-	*/
-
+	
+*/
 /*	
 	Matrix PD = newMatrix(size(A));
 	Matrix TP = transpose(B);
@@ -544,6 +544,7 @@ Matrix product(Matrix A, Matrix B){
 	freeMatrix(&TP);
 	return(PD);
 */
+	
 	Matrix PD = newMatrix(size(A));
 	Matrix TP = transpose(B);
 	double dot_sum = 0;
@@ -581,6 +582,7 @@ Matrix product(Matrix A, Matrix B){
 	}
 	freeMatrix(&TP);
 	return(PD);
+
 }
 // printMatrix()
 // Prints a string representation of Matrix M to filestream out. Zero rows 
@@ -624,13 +626,16 @@ void printMatrix(FILE* out, Matrix M){
 			if (j == 1){
 				fprintf(out, "%d: ", i);
 			}
-			fprintf(out, "(%d, %.1f) ", curr_entry->col, curr_entry->value);
+			fprintf(out, "(%d, %.1f)", curr_entry->col, curr_entry->value);
 			if(j == length(L)){
 				fprintf(out, "\n");
+			}else{
+				fprintf(out, " ");
 			}
 			moveNext(L);
 		}
 	}
+	fprintf(out, "\n");
 	
 }
 
