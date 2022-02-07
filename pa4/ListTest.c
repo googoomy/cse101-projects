@@ -1,3 +1,13 @@
+/********************************************
+ * James Gu
+ * jjgu
+ * pa4
+ *
+ *
+ * 
+ *******************************************/
+
+ //from the grading script
 #include <setjmp.h>
 #include <signal.h>
 #include <stdbool.h>
