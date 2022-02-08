@@ -40,12 +40,14 @@ int main(int argc, char * argv[]){
 	int n = 0;
 	int nnz_A = 0;
 	int nnz_B = 0;
+	//grab the size and non zero values from the first line
 	fscanf(in, "%d %d %d", &n, &nnz_A, &nnz_B);
 	Matrix A = newMatrix(n);
 	Matrix B = newMatrix(n);
 	int row = 0;
 	int col = 0;
 	double val = 0;
+	//grab the rest of the mtrices
 	for(int i = 1; i <= nnz_A; i++){
 		fscanf(in, "%d %d %lf", &row, &col, &val);
 		changeEntry(A, row, col, val);
@@ -54,7 +56,7 @@ int main(int argc, char * argv[]){
 		fscanf(in, "%d %d %lf", &row, &col, &val);
 		changeEntry(B, row, col, val);
 	}
-
+	//all operations
 	Matrix ScaleA = scalarMult(1.5, A);
 	Matrix SumAB = sum(A, B);
 	Matrix DoubleA = sum(A, A);
@@ -64,6 +66,7 @@ int main(int argc, char * argv[]){
 	Matrix MultAB = product(A, B);
 	Matrix MultBB = product(B, B);
 
+	//print all operations
 	fprintf(out, "A has %d non-zero entries:\n", nnz_A);
 	printMatrix(out, A);
 

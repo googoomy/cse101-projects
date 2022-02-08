@@ -106,18 +106,23 @@ int NNZ(Matrix M){
 // equals()
 // Return true (1) if matrices A and B are equal, false (0) otherwise.
 int equals(Matrix A, Matrix B){
+	//if different sizes, not equal
 	if(size(A) != size(B)){
 		return 0;
 	}
+	//if they have different amount of nonzeros
 	if(NNZ(A) != NNZ(B)){
 		return 0;
 	}
+	//if both matrices are empty
 	if(size(A) == 0 && size(B) == 0){
 		return 1;
 	}
+	//if both matrices are null
 	if(A == NULL && B == NULL){
 		return 1;
 	}
+	//loop through both matrices and see if all entries are the same
 	for(int i = 1; i <= size(A); i++){
 		moveFront(A->rows[i]);
 		moveFront(B->rows[i]);
@@ -167,12 +172,14 @@ void changeEntry(Matrix M, int i, int j, double x){
 		fprintf(stderr, "Matrix Error: calling changeEntry() with invalid column. Comlumn must be 1<=j<=size(M)\n");
 		exit(EXIT_FAILURE);
 	}
+	
 	Entry E = NULL;
 	if(x != 0.0){
 		E = newEntry(j, x);
 	}
-	List L = M->rows[i];
 	
+	List L = M->rows[i];
+	//if the List is empty eppend the entry	
 	if(length(L) == 0){
 		if(x != 0.0){
 			append(L, E);
@@ -180,6 +187,7 @@ void changeEntry(Matrix M, int i, int j, double x){
 			return;
 		}
 	}
+
 	
 	Entry curr_entry = NULL;
 	moveFront(L);
@@ -193,8 +201,9 @@ void changeEntry(Matrix M, int i, int j, double x){
 			if(x == 0){
 				//freeEntry(&E);
 				//freeEntry(&curr_entry);
-				free(M->rows[i]);
+				//free(M->rows[i]);
 				delete(L);
+				freeList(&L);
 				M->nnz--;
 				return;
 			}
@@ -218,37 +227,6 @@ void changeEntry(Matrix M, int i, int j, double x){
 		moveNext(L);
 	}
 
-	/*
-	moveFront(L);
-	while(index(L) != -1){
-		Entry curr_entry = get(M->rows[i]);
-		if(curr_entry->col == j && x == 0.0){
-			freeEntry(&E);
-			delete(L);
-			M->nnz--;
-			return;
-		}	
-		else if(curr_entry->col == j && x != 0.0){
-			
-			insertBefore(L, E);
-			M->nnz++;
-			
-			curr_entry->value = x;
-			return;
-		}
-		else if(curr_entry->col < j){
-			insertBefore(L, E);
-			M->nnz++;
-			return;	
-		}	
-		else if(index(L) == length(L)){
-			//insertAfter(L, E);
-			//M->nnz++;
-		}
-		moveNext(L);
-	}
-	*/
-
 }
 
 // Matrix Arithmetic operations 
@@ -258,6 +236,7 @@ Matrix copy(Matrix A){
 	if(A == NULL){
 		return NULL;
 	}
+	//traverse matrix A and add each entry to copy
 	Matrix CPY = newMatrix(size(A));
 	for(int i = 1; i <= size(A); i++){
 		moveFront(A->rows[i]);
@@ -277,6 +256,7 @@ Matrix transpose(Matrix A){
 	if(A == NULL){
 		return NULL;
 	}
+	//traverse matrix A and add each entry to transpose but with flipped indices
 	Matrix TP = newMatrix(size(A));
 	for(int i = 1; i <= size(A); i++){
 		moveFront(A->rows[i]);
@@ -296,10 +276,12 @@ Matrix scalarMult(double x, Matrix A){
 		return NULL;
 	}
 	Matrix SM = newMatrix(size(A));
+	//if x is 0.0 then it is a zero matrix
 	if(x == 0.0){
 		makeZero(SM);
 		return SM;
 	}
+	//traverse matrix A and multiply each entry by the scalar
 	for(int i = 1; i <= size(A); i++){
 		moveFront(A->rows[i]);
 		while(index(A->rows[i]) != -1){
@@ -322,6 +304,7 @@ Matrix sum(Matrix A, Matrix B){
 		fprintf(stderr, "Matrix Error: calling sum() with matrices of different sizes\n");
 		exit(EXIT_FAILURE);
 	}
+	//if the two matrices are the same then the sum is double
 	if(equals(A,B) == 1){
 		return scalarMult(2.0, A);		
 	}
@@ -343,17 +326,19 @@ Matrix sum(Matrix A, Matrix B){
 					moveNext(LA);
 					moveNext(LB);
 				}else if(curr_A->col > curr_B->col){
-					//catch up
+					//if A is 0.0
 					changeEntry(SumM, i, curr_B->col, curr_B->value);
 					moveNext(LB);	
 				}else{
-					//catch up
+					//if B is 0.0
 					changeEntry(SumM, i, curr_A->col, curr_A->value);
 					moveNext(LA);
 				}
+			//if A reached the end first
 			}else if(index(LB) == -1 && index(LA) != -1){
 					changeEntry(SumM, i, curr_A->col, curr_A->value);
 					moveNext(LA);
+			//if B reached the end first
 			}else{
 					changeEntry(SumM,i, curr_B->col, curr_B->value);
 					moveNext(LB);	
@@ -394,17 +379,19 @@ Matrix diff(Matrix A, Matrix B){
 					moveNext(LA);
 					moveNext(LB);
 				}else if(curr_A->col > curr_B->col){
-					//when 0
+					//when A is 0
 					changeEntry(DiffM, i, curr_B->col, 0.0-curr_B->value);
 					moveNext(LB);	
 				}else{
-					//when 0
+					//when B is 0
 					changeEntry(DiffM, i, curr_A->col, curr_A->value);
 					moveNext(LA);
 				}
+			//if A reached the end first
 			}else if(index(LB) == -1 && index(LA) != -1){
 				changeEntry(DiffM, i, curr_A->col, curr_A->value);
 				moveNext(LA);
+			//if B reached the end first
 			}else{
 				changeEntry(DiffM,i, curr_B->col, 0.0-curr_B->value);
 				moveNext(LB);	
@@ -414,73 +401,7 @@ Matrix diff(Matrix A, Matrix B){
 	}
 	return(DiffM);	
 }
-/*
-double vectorDot(List P, List Q){
-	
-	double dot_sum;
-	moveFront(P);
-	moveFront(Q);
-	Entry curr_P;
-	Entry curr_Q;
-	while(index(P) != -1 && index(Q) != -1){
-		if(index(P) != -1 && index(Q) != -1){
-			curr_P = get(P);
-			curr_Q = get(Q);
-		}
-		if(curr_P->col == curr_Q->col){
-			dot_sum += curr_P->value * curr_Q->value;
-			moveNext(P);
-			moveNext(Q);
-		}else if(curr_P->col > curr_Q->col){
-			moveNext(Q);
-		}else{
-			moveNext(P);
-		}
-	}
-	return dot_sum;
-	
-	
-	double dot_sum;
-	moveFront(P);
-	moveFront(Q);
-	Entry curr_P;
-	Entry curr_Q;
-	//for(int i = 1; i <= length(P); i++){
-	while(index(P) != -1 || index(Q) != -1){
-		
-		//if(index(P) != -1){
-		//	curr_P = get(P);
-		//}
-		//if(index(Q) != -1){
-		//	curr_Q = get(Q);
-		//}
-		
-		if(index(P) != -1 && index(Q) != -1){
-		//if(index(P) >= 0 && index(Q) >= 0){
-			curr_P = get(P);
-			curr_Q = get(Q);
-			if(curr_P->col == curr_Q->col){
-				dot_sum += (curr_P->value * curr_Q->value);
-				moveNext(Q);
-				moveNext(P);
-			}
-			if(curr_P->col > curr_Q->col){
-				moveNext(Q);
-			}
-			if(curr_Q->col < curr_P->col){
-				moveNext(P);
-			}
-		}else if(index(P) == -1 && index(Q) != -1 ){
-		//}else if(index(Q)>=0){	
-			moveNext(Q);
-		}else{
-			moveNext(P);
-		}
-	}
-	return dot_sum;
-	
-}
-*/
+
 // product()
 // Returns a reference to a new Matrix object representing AB
 // pre: size(A)==size(B)
@@ -493,22 +414,8 @@ Matrix product(Matrix A, Matrix B){
 		fprintf(stderr, "Matrix Error: calling product() with matrices of different sizes\n");
 		exit(EXIT_FAILURE);
 	}
-/*
-	Matrix PD = newMatrix(size(A));
-	Matrix TP = transpose(B);
-	for(int i = 1; i <= size(A); i++){
-		for(int j = 1; j <= size(A); j++){
-			double dot_sum = vectorDot(A->rows[i], TP->rows[i]);
-			if(dot_sum != 0){
-				changeEntry(PD, i, j, dot_sum);
-		
-			}
-		}
-	}
-	return(PD);
 	
-*/
-/*	
+	//prep the matrices one for the product one for transpose of B
 	Matrix PD = newMatrix(size(A));
 	Matrix TP = transpose(B);
 	double dot_sum = 0;
@@ -516,57 +423,14 @@ Matrix product(Matrix A, Matrix B){
 	List LB;
 	Entry curr_A;
 	Entry curr_B;
+	//loop trhough each row and multiply the row by the transpose's row
 	for(int i = 1; i <= size(A); i++){
 		LA = A->rows[i];
 		moveFront(LA);
 		for(int j = 1; j <= size(A); j++){
 			LB = TP->rows[j];
 			moveFront(LB);
-			while(index(LA) != -1 || index(LB) != -1){
-				if(index(LA) != -1 && index(LB) != -1){
-					curr_A = get(LA);
-					curr_B = get(LB);
-				
-					if(curr_A->col == curr_B->col){
-						dot_sum += (curr_A->value * curr_B->value);
-						moveNext(LA);
-						moveNext(LB);
-					}else if(curr_A->col > curr_B->col){
-						moveNext(LB);
-					}else{
-						moveNext(LA);
-					}
-				}else if(index(LB) == -1 && index(LA) != -1){
-					moveNext(LA);
-				}
-				else{
-					moveNext(LB);
-				}
-			}
-			if(dot_sum != 0){
-				changeEntry(PD, i, j, dot_sum);
-				dot_sum = 0;
-			}
-			moveFront(LA);
-		}
-	}
-	freeMatrix(&TP);
-	return(PD);
-*/
-	
-	Matrix PD = newMatrix(size(A));
-	Matrix TP = transpose(B);
-	double dot_sum = 0;
-	List LA;
-	List LB;
-	Entry curr_A;
-	Entry curr_B;
-	for(int i = 1; i <= size(A); i++){
-		LA = A->rows[i];
-		moveFront(LA);
-		for(int j = 1; j <= size(A); j++){
-			LB = TP->rows[j];
-			moveFront(LB);
+			//dot product
 			while(index(LA) != -1 && index(LB) != -1){
 				curr_A = get(LA);
 				curr_B = get(LB);
@@ -582,9 +446,11 @@ Matrix product(Matrix A, Matrix B){
 				}
 
 			}
+			//add the dot product
 			if(dot_sum != 0){
 				changeEntry(PD, i, j, dot_sum);
 			}
+			//reset the sum
 			dot_sum = 0;
 			moveFront(LA);
 		}
@@ -604,27 +470,7 @@ void printMatrix(FILE* out, Matrix M){
 		fprintf(stderr, "Matrix Error: calling printMatrix() on NULL Matrix reference\n");
 		exit(EXIT_FAILURE);
 	}
-/*
-	for(int i = 1; i <= size(M); i++){
-		moveFront(M->rows[i]);
-		if(index(M->rows[i]) != -1){
-			if(i != 1){
-				fprintf(out, "\n");
-			}	
-			fprintf(out, "%d: ", i);		
-		}
-		while(index(M->rows[i]) != -1){
-			Entry curr_entry = get(M->rows[i]);
-			fprintf(out, "(%d, %.1f) ", curr_entry->col, curr_entry->value);
-			moveNext(M->rows[i]);
-		}	
-		if(i >= 1 && index(M->rows[i]) != -1){
-			fprintf(out, "\n");			
-		}
-	}
-
-*/
-
+	
 	List L;
 	for(int i = 1; i <= size(M); i++){
 		L = M->rows[i];

@@ -62,6 +62,18 @@ int main(){
 	Matrix prodN = product(N, N);
 	printMatrix(stdout, prodN);
 
+	printf("copy:\n");
+	Matrix copyM = copy(M);
+	printMatrix(stdout, copyM);
+
+	printf("zero:\n");
+	makeZero(M);
+	printMatrix(stdout, M);
+	
+	printf("equals:\n");
+	printf("%d\n", equals(M, M));
+
+	freeMatrix(&copyM);
 	freeMatrix(&M);
 	freeMatrix(&N);
 	freeMatrix(&sumM);
