@@ -58,26 +58,6 @@ Matrix newMatrix(int n){
 // Frees heap memory associated with *pM, sets *pM to NULL.
 void freeMatrix(Matrix* pM){
 	if(pM != NULL && *pM != NULL){
-		/*
-		makeZero(*pM);
-		for(int i = 1; i <= size(*pM); i++){
-			freeList(&((*pM)->rows[i]));
-		}
-		free((*pM)->rows);
-		*/
-		/*
-		for(int i = 1; i <= size(*pM); i++){
-			moveFront((*pM)->rows[i]);
-			while(index((*pM)->rows[i]) != -1){
-				freeEntry(get((*pM)->rows[i]));
-				moveNext((*pM)->rows[i]);
-			}	
-		}
-		for(int i = 1; i<= size(*pM); i++){
-			freeList(&((*pM)->rows[i]));
-		}
-		free((*pM)->rows);
-		*/
 		free(*pM);
 		*pM = NULL;
 	}
@@ -198,25 +178,26 @@ void changeEntry(Matrix M, int i, int j, double x){
 			curr_entry = NULL;
 		}
 		if(curr_entry->col == j){
+			//remove the entry if the replacement is zero
 			if(x == 0){
-				//freeEntry(&E);
-				//freeEntry(&curr_entry);
-				//free(M->rows[i]);
 				delete(L);
 				freeList(&L);
 				M->nnz--;
 				return;
 			}
 			else{
+			//if a value is already there, replace it
 				curr_entry->value = x;
 				return;
 			}
+		//if there were zeros insert before
 		}else if(curr_entry->col > j){
 			if(x != 0){
 				insertBefore(L, E);
 				M->nnz++;
 			}
 			return;
+		//ifthe traverssal reaches the end of the list insert the new entry at the end
 		}else if(k == length(L)){
 			if(x != 0){
 				insertAfter(L, E);
