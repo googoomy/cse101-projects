@@ -471,7 +471,6 @@ void printMatrix(FILE* out, Matrix M){
 			moveNext(L);
 		}
 	}
-	fprintf(out, "\n");
 	
 }
 

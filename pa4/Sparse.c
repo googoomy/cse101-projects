@@ -69,33 +69,43 @@ int main(int argc, char * argv[]){
 	//print all operations
 	fprintf(out, "A has %d non-zero entries:\n", nnz_A);
 	printMatrix(out, A);
-
+	fprintf(out, "\n");
+	
 	fprintf(out, "B has %d non-zero entries:\n", nnz_B);
 	printMatrix(out, B);
-
+	fprintf(out, "\n");
+	
 	fprintf(out, "(1.5)*A =\n");
 	printMatrix(out, ScaleA);
-
+	fprintf(out, "\n");
+	
 	fprintf(out, "A+B =\n");
 	printMatrix(out, SumAB);
+	fprintf(out, "\n");
 	
 	fprintf(out, "A+A =\n");
 	printMatrix(out, DoubleA);
-
+	fprintf(out, "\n");
+	
 	fprintf(out, "B-A =\n");
 	printMatrix(out, DiffBA);
-
+	fprintf(out, "\n");
+	
 	fprintf(out, "A-A =\n");
 	printMatrix(out, DiffAA);
-
+	fprintf(out, "\n");
+	
 	fprintf(out, "Transpose(A) =\n");
 	printMatrix(out, TransA);
-
+	fprintf(out, "\n");
+	
 	fprintf(out, "A*B =\n");
 	printMatrix(out, MultAB);
-
+	fprintf(out, "\n");
+	
 	fprintf(out, "B*B =\n");
 	printMatrix(out, MultBB);
+	fprintf(out, "\n");
 
 	freeMatrix(&A);
 	freeMatrix(&B);
