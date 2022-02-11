@@ -2,129 +2,190 @@
 #include <string>
 #include "List.h"
 
-// Exported types -------------------------------------------------------------
-typedef int ListElement;
+#define DUMMY_NUM -1
 
-class List{
+List::Node::Node(int x){
+	data = x;
+	next = nullptr;
+	prev = nullptr;
+}
 
-private:
+List::List(){
+	frontDummy = new Node(DUMMY_NUM);
+	backDummy = new Node(DUMMY_NUM);
+	frontDummy->next = backDummy;
+	backDummy->prev = frontDummy;
+	beforeCursor = frontDummy;
+	afterCursor = backDummy;
+	pos_cursor = 0;
+	num_elements = 0;
+}
 
-   // private Node struct
-   struct Node{
-      // Node fields
-      ListElement data;
-      Node* next;
-      Node* prev;
-      // Node constructor
-      Node(ListElement x);
-   };
+List::List(const List& L){
+	frontDummy = new Node(DUMMY_NUM);
+	backDummy = new Node(DUMMY_NUM);
+	frontDummy->next = backDummy;
+	backDummy->prev = frontDummy;
+	beforeCursor = frontDummy;
+	afterCursor = backDummy;
+	pos_cursor = 0;
+	num_elements= 0;
 
-   // List fields
-   Node* frontDummy;
-   Node* backDummy;
-   Node* beforeCursor;
-   Node* afterCursor;
-   int pos_cursor;
-   int num_elements;
+	//load elements of L into this List
+	Node *N = L.frontDummy->next;
+	while(N != L.backDummy){
+		this->insertBefore(N->data);
+		N = N->next;
+	}
+	//reset cursor
+	this->moveFront();
+}
 
-public:
-
-   // Class Constructors & Destructors ----------------------------------------
-   
-   // Creates new List in the empty state.
-   List();
-
-   // Copy constructor.
-   List(const List& L);
-
-   // Destructor
-   ~List();
-
-
+//Destructor
+List::~List(){
+	clear();
+	delete(frontDummy);
+	delete(backDummy);
+}
    // Access functions --------------------------------------------------------
 
    // length()
    // Returns the length of this List.
-   int length() const;
-
+int List::length() const{
+	return num_elements;
+}
+	
    // front()
    // Returns the front element in this List.
    // pre: length()>0
-   ListElement front() const;
+ListElement List::front() const{
+	if(length() <= 0){
+		throw std::length_error("List: front(): empty List");
+	}
+	return frontDummy;
+}
 
    // back()
    // Returns the back element in this List.
    // pre: length()>0
-   ListElement back() const;
+ListElement List::back() const{
+	if(length() <= 0){
+		throw std::length_error("List: back(): empty List");
+	}
+	return backDummy;
+}
 
    // position()
    // Returns the position of cursor in this List: 0 <= position() <= length().
-   int position() const;
+int List::position() const{
+	return pos_cursor;
+}
 
    // peekNext()
    // Returns the element after the cursor.
    // pre: position()<length()
-   ListElement peekNext() const;
+ListElement List::peekNext() const{
+	if(position() >= length()){
+		throw std::position_error("List: peekNext(): no next element in List");
+	}
+	return afterCursor->data;
+}
+
 
    // peekPrev()
    // Returns the element before the cursor.
    // pre: position()>0
-   ListElement peekPrev() const;
+ListElement List::peekPrev() const{
+	if(position <= 0){
+		throw std::position_error("List: peekPrev(): no previous element in List");
+	}
+	return beforeCursor->data;
+}
 
 
    // Manipulation procedures -------------------------------------------------
 
    // clear()
    // Deletes all elements in this List, setting it to the empty state.
-   void clear();
+void List::clear(){
+	moveFront();
+	while(length() != 0){
+		eraseAfter();
+	}
+}
 
    // moveFront()
    // Moves cursor to position 0 in this List.
-   void moveFront();
+void List::moveFront(){
+	beforeCursor = frontDummy;
+	afterCursor = frontDummy->next;
+	pos_cursor = 0;
+
+}
 
    // moveBack()
    // Moves cursor to position length() in this List.
-   void moveBack();
+void List::moveBack(){
+	afterCursor = backDummy;
+	beforeCursor = backDummy->prev;
+	pos_cursor = length();
+}	
 
    // moveNext()
    // Advances cursor to next higher position. Returns the List element that
    // was passed over. 
    // pre: position()<length() 
-   ListElement moveNext();
+ListElement List::moveNext(){
+	if(position() >= length()){
+		throw std::position_error("List: moveNext(): no next element in List");
+	}
+	pos_cursor++;
+	beforeCursor = beforeCursor->next;
+	afterCursor = afterCursor->next;
+	return beforeCursor->data;
+}
 
    // movePrev()
    // Advances cursor to next lower position. Returns the List element that
    // was passed over. 
    // pre: position()>0
-   ListElement movePrev();
+ListElement List::movePrev(){
+	if(position() <= 0){
+		throw std::position_error("List: movePrev(): no previous element in List");
+	}
+	pos_cursor--;
+	beforeCursor = beforeCursor->prev;
+	afterCursor = afteerCursor->prev;
+	return afterCursor->data;
+}
 
    // insertAfter()
    // Inserts x after cursor.
-   void insertAfter(ListElement x);
+void insertAfter(ListElement x);
 
    // insertBefore()
    // Inserts x before cursor.
-   void insertBefore(ListElement x);
+void insertBefore(ListElement x);
 
    // setAfter()
    // Overwrites the List element after the cursor with x.
    // pre: position()<length()
-   void setAfter(ListElement x);
+void setAfter(ListElement x);
 
    // setBefore()
    // Overwrites the List element before the cursor with x.
    // pre: position()>0
-   void setBefore(ListElement x);
+void setBefore(ListElement x);
 
    // eraseAfter()
    // Deletes element after cursor.
    // pre: position()<length()
-   void eraseAfter();
+void eraseAfter();
 
    // eraseBefore()
    // Deletes element before cursor.
    // pre: position()>0
-   void eraseBefore();
+void eraseBefore();
 
 
    // Other Functions ---------------------------------------------------------
@@ -135,7 +196,7 @@ public:
    // is found, places the cursor immediately after the found element, then 
    // returns the final cursor position. If x is not found, places the cursor 
    // at position length(), and returns -1. 
-   int findNext(ListElement x);
+int findNext(ListElement x);
 
    // findPrev()
    // Starting from the current cursor position, performs a linear search (in 
@@ -143,7 +204,7 @@ public:
    // is found, places the cursor immediately before the found element, then
    // returns the final cursor position. If x is not found, places the cursor 
    // at position 0, and returns -1. 
-   int findPrev(ListElement x);
+int findPrev(ListElement x);
 
    // cleanup()
    // Removes any repeated elements in this List, leaving only unique elements.
@@ -151,36 +212,36 @@ public:
    // occurrance of each element, and removing all other occurances. The cursor 
    // is not moved with respect to the retained elements, i.e. it lies between 
    // the same two retained elements that it did before cleanup() was called.
-   void cleanup();
+void cleanup();
  
    // concat()
    // Returns a new List consisting of the elements of this List, followed by
    // the elements of L. The cursor in the returned List will be at postion 0.
-   List concat(const List& L) const;
+List concat(const List& L) const;
 
    // to_string()
    // Returns a string representation of this List consisting of a comma 
    // separated sequence of elements, surrounded by parentheses.
-   std::string to_string() const;
+std::string to_string() const;
 
    // equals()
    // Returns true if and only if this List is the same integer sequence as R.
    // The cursors in this List and in R are unchanged.
-   bool equals(const List& R) const;
+bool equals(const List& R) const;
 
 
    // Overriden Operators -----------------------------------------------------
    
    // operator<<()
    // Inserts string representation of L into stream.
-   friend std::ostream& operator<<( std::ostream& stream, const List& L );
+friend std::ostream& operator<<( std::ostream& stream, const List& L );
 
    // operator==()
    // Returns true if and only if A is the same integer sequence as B. The 
    // cursors in both Lists are unchanged.
-   friend bool operator==( const List& A, const List& B );
+friend bool operator==( const List& A, const List& B );
 
    // operator=()
    // Overwrites the state of this List with state of L.
-   List& operator=( const List& L );
+List& operator=( const List& L );
 
