@@ -4,7 +4,7 @@
 
 #define DUMMY_NUM -1
 
-List::Node::Node(int x){
+List::Node::Node(ListElement x){
 	data = x;
 	next = nullptr;
 	prev = nullptr;
@@ -161,31 +161,81 @@ ListElement List::movePrev(){
 
    // insertAfter()
    // Inserts x after cursor.
-void insertAfter(ListElement x);
+void List::insertAfter(ListElement x){
+	Node* N = new Node(x);
+	N->prev = beforeCursor;
+	N->next = afterCursor;
+	beforeCursor->next = N;
+	afterCursor->prev = N;
+	afterCursor = N;
+	num_elements++;
+}
 
    // insertBefore()
    // Inserts x before cursor.
-void insertBefore(ListElement x);
+void List::insertBefore(ListElement x){
+	Node* N = new Node(x);
+	N->prev = beforeCursor;
+	N->next = afterCursor;
+	beforeCursor->next = N;
+	afterCursor->prev = N;
+	beforeCursor = N;
+	pos_cursor++;
+	num_elements++;
+}
 
    // setAfter()
    // Overwrites the List element after the cursor with x.
    // pre: position()<length()
-void setAfter(ListElement x);
+void List::setAfter(ListElement x){
+	if(position() >= length()){
+		throw std::position_error("List: setAfter(): no next element in List");
+	}
+	eraseAfter();
+	insertAfter();
+}
 
    // setBefore()
    // Overwrites the List element before the cursor with x.
    // pre: position()>0
-void setBefore(ListElement x);
+void List::setBefore(ListElement x){
+	if(position() <= 0){
+		throw std::position_error("List: eraseNext(): no previous element in List");
+	}
+	eraseBefore();
+	insertBefore();
+}
 
    // eraseAfter()
    // Deletes element after cursor.
    // pre: position()<length()
-void eraseAfter();
+void List::eraseAfter(){
+	if(position() >= length()){
+		throw std::position_error("List: eraseNext(): no next element in List");
+	}
+	Node* N = afterCursor;
+	afterCursor = afterCursor->next;
+	beforeCursor->next = afterCursor;
+	afterCursor->prev = beforeCursor;
+	delete N;
+	num_elements--;
+}
 
    // eraseBefore()
    // Deletes element before cursor.
    // pre: position()>0
-void eraseBefore();
+void List::eraseBefore(){
+	if(position() <= 0){
+		throw std::position_error("List: eraseNext(): no previous element in List");
+	}
+	Node* N = beforeCursor;
+	beforeCursor = beforeCursor->prev;
+	afterCursor->prev = beforeCursor;
+	beforeCursor->next = afterCursor;
+	delete N;
+	pos_cursor--;
+	num_elements--;
+}
 
 
    // Other Functions ---------------------------------------------------------
@@ -196,7 +246,16 @@ void eraseBefore();
    // is found, places the cursor immediately after the found element, then 
    // returns the final cursor position. If x is not found, places the cursor 
    // at position length(), and returns -1. 
-int findNext(ListElement x);
+int List::findNext(ListElement x){
+	while(afterCursor != backDummy){
+		if(afterCursor->data == x){
+			moveNext();
+			return pos_cursor;
+		}
+		moveNext();
+	}
+	return -1;
+}
 
    // findPrev()
    // Starting from the current cursor position, performs a linear search (in 
@@ -204,7 +263,16 @@ int findNext(ListElement x);
    // is found, places the cursor immediately before the found element, then
    // returns the final cursor position. If x is not found, places the cursor 
    // at position 0, and returns -1. 
-int findPrev(ListElement x);
+int List::findPrev(ListElement x){
+	while(beforeCursor != frontDummy){
+		if(beforeCursor->data == x){
+			movePrev();
+			return pos_cursor;
+		}
+		movePrev();
+	}
+	return -1;
+}
 
    // cleanup()
    // Removes any repeated elements in this List, leaving only unique elements.
