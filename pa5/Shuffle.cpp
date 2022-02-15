@@ -39,7 +39,8 @@ void shuffle(List& D){
 	if((j+k) % 2 != 0){
 		D.insertBefore(split2.peekNext());
 	}
-
+	delete &split1;
+	delete &split2;
 }
 
 int main(int argc, char * argv[]){
@@ -73,6 +74,8 @@ int main(int argc, char * argv[]){
 		}	
 		cout << " " << left << setw(16) << i << right << shuffle_count <<endl;
 	}
+	delete &deck;
+	delete &deck_copy;
 }
 
 

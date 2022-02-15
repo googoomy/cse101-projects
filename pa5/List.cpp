@@ -215,35 +215,35 @@ void List::setBefore(ListElement x){
 	   // eraseAfter()
 	   // Deletes element after cursor.
 	   // pre: position()<length()
-	void List::eraseAfter(){
-		if(position() >= length()){
-			std::cerr << "List: eraseAfter(): no next element in List" << std::endl;
-			exit(1);
-		}
-		Node* N = afterCursor;
-		afterCursor = afterCursor->next;
-		beforeCursor->next = afterCursor;
-		afterCursor->prev = beforeCursor;
-		delete N;
-		num_elements--;
+void List::eraseAfter(){
+	if(position() >= length()){
+		std::cerr << "List: eraseAfter(): no next element in List" << std::endl;
+		exit(1);
 	}
+	Node* N = afterCursor;
+	afterCursor = afterCursor->next;
+	beforeCursor->next = afterCursor;
+	afterCursor->prev = beforeCursor;
+	delete N;
+	num_elements--;
+}
 
 	   // eraseBefore()
 	   // Deletes element before cursor.
 	   // pre: position()>0
-	void List::eraseBefore(){
-		if(position() <= 0){
-			std::cerr << "List: eraseBefore(): no previous element in List" << std::endl;
-			exit(1);
-		}
-		Node* N = beforeCursor;
-		beforeCursor = beforeCursor->prev;
-		afterCursor->prev = beforeCursor;
-		beforeCursor->next = afterCursor;
-		delete N;
-		pos_cursor--;
-		num_elements--;
+void List::eraseBefore(){
+	if(position() <= 0){
+		std::cerr << "List: eraseBefore(): no previous element in List" << std::endl;
+		exit(1);
 	}
+	Node* N = beforeCursor;
+	beforeCursor = beforeCursor->prev;
+	afterCursor->prev = beforeCursor;
+	beforeCursor->next = afterCursor;
+	delete N;
+	pos_cursor--;
+	num_elements--;
+}
 
 
 	   // Other Functions ---------------------------------------------------------
@@ -254,16 +254,16 @@ void List::setBefore(ListElement x){
 	   // is found, places the cursor immediately after the found element, then 
 	   // returns the final cursor position. If x is not found, places the cursor 
 	   // at position length(), and returns -1. 
-	int List::findNext(ListElement x){
-		while(afterCursor != backDummy){
-			if(afterCursor->data == x){
-				moveNext();
-				return pos_cursor;
-			}
+int List::findNext(ListElement x){
+	while(afterCursor != backDummy){
+		if(afterCursor->data == x){
 			moveNext();
+			return pos_cursor;
 		}
-		return -1;
+		moveNext();
 	}
+	return -1;
+}
 
 	   // findPrev()
 	   // Starting from the current cursor position, performs a linear search (in 
@@ -271,16 +271,16 @@ void List::setBefore(ListElement x){
 	   // is found, places the cursor immediately before the found element, then
 	   // returns the final cursor position. If x is not found, places the cursor 
 	   // at position 0, and returns -1. 
-	int List::findPrev(ListElement x){
-		while(beforeCursor != frontDummy){
-			if(beforeCursor->data == x){
-				movePrev();
-				return pos_cursor;
-			}
+int List::findPrev(ListElement x){
+	while(beforeCursor != frontDummy){
+		if(beforeCursor->data == x){
 			movePrev();
+			return pos_cursor;
 		}
-		return -1;
+		movePrev();
 	}
+	return -1;
+}
 
 	   // cleanup()
 	   // Removes any repeated elements in this List, leaving only unique elements.
@@ -288,40 +288,39 @@ void List::setBefore(ListElement x){
 	   // occurrance of each element, and removing all other occurances. The cursor 
 	   // is not moved with respect to the retained elements, i.e. it lies between 
 	   // the same two retained elements that it did before cleanup() was called.
-	void List::cleanup(){
-		Node* N = frontDummy->next;
-		ListElement i = 0;
-		int curr_pos = pos_cursor;
-		int orig_size = length();
-		for(int j = 0; j < orig_size; j++){
-			moveFront();
-			int fn = findNext(N->data);
-			while(true){
-				if(fn == -1){
-					break;
-				}
-				if(N->next == backDummy){
-					break;
-				}
-				if(pos_cursor <= curr_pos){
-					curr_pos--;
-				}
-				eraseBefore();
-			}
-			N = frontDummy->next;
-			i++;
-
-			for(int k = 0; k < i; k++){
-				N = N->next;
-			}
-		}
-		
+void List::cleanup(){
+	Node* N = frontDummy->next;
+	ListElement i = 0;
+	int curr_pos = pos_cursor;
+	//int orig_size = length();
+	//for(int j = 0; j < orig_size; j++){
+	while(afterCursor != backDummy){
 		moveFront();
-		for(int k = 0; k < curr_pos; k++){
-			moveNext();
+		int fn = findNext(N->data);
+		while(true){
+			if(fn == -1){
+				break;
+			}
+			if(N->next == backDummy){
+				break;
+			}
+			if(pos_cursor <= curr_pos){
+				curr_pos--;
+			}
+			eraseBefore();
 		}
-
+		N = frontDummy->next;
+		i++;
+		for(int k = 0; k < i; k++){
+			N = N->next;
+		}
 	}
+	
+	moveFront();
+	for(int k = 0; k < curr_pos; k++){
+		moveNext();
+	}
+}
 	 
 	   // concat()
 	   // Returns a new List consisting of the elements of this List, followed by
