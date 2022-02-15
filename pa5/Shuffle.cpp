@@ -39,6 +39,7 @@ void shuffle(List& D){
 	if((j+k) % 2 != 0){
 		D.insertBefore(split2.peekNext());
 	}
+	
 }
 
 int main(int argc, char * argv[]){
@@ -71,6 +72,8 @@ int main(int argc, char * argv[]){
 			shuffle_count++;
 		}	
 		cout << " " << left << setw(16) << i << right << shuffle_count <<endl;
+		deck.clear();
+		deck_copy.clear();
 	}
 }
 
