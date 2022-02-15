@@ -290,20 +290,20 @@ int List::findPrev(ListElement x){
 	   // the same two retained elements that it did before cleanup() was called.
 void List::cleanup(){
 	Node* N = frontDummy->next;
-	int i = 0;
+	int count = 0;
 	int fn = 0;
 	int curr_pos = pos_cursor;
+	//int orig_pos = pos_cursor;
+	//Node* orig_before = beforeCursor;
+	//Node* orig_after = afterCursor;
 	//int orig_size = length();
 	//for(int j = 0; j < orig_size; j++){
 	while(N != backDummy){
 		moveFront();
-		findNext(N->data);
+		fn = findNext(N->data);
 		while(true){
 			fn = findNext(N->data);
 			if(fn == -1){
-				break;
-			}
-			if(N->next == backDummy){
 				break;
 			}
 			if(pos_cursor <= curr_pos){
@@ -312,16 +312,20 @@ void List::cleanup(){
 			eraseBefore();
 		}
 		N = frontDummy->next;
-		i++;
-		for(int j = 0; j < i; j++){
+		count++;
+		for(int j = 0; j < count; j++){
 			N = N->next;
 		}
 	}
+	
 	
 	moveFront();
 	for(int j = 0; j < curr_pos; j++){
 		moveNext();
 	}
+	//pos_cursor = orig_pos;
+	//afterCursor = orig_after;
+	//beforeCursor = orig_before;
 }
 	 
 	   // concat()
