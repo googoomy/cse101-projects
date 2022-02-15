@@ -1,3 +1,11 @@
+//-----------------------------------------------------------------------------
+// James Gu
+// jjgu
+// pa5
+//
+//
+// Shuffle.cpp
+//-----------------------------------------------------------------------------
 #include <iostream>
 #include <string>
 #include <iomanip>
@@ -9,13 +17,17 @@ using namespace std;
 void shuffle(List& D){
 	List split1;
 	List split2;
+	//first half
 	int j = D.length() / 2;
+	//second half
 	int k = D.length()-j;
 	D.moveFront();
+	//getelements for the first split
 	for(int i = 0; i < j; i++){
 		split1.insertBefore(D.peekNext());
 		D.moveNext();
 	}
+	//get elements for the second split
 	for(int i = 0; i < k; i++){
 		split2.insertBefore(D.peekNext());
 		D.moveNext();
@@ -36,6 +48,7 @@ void shuffle(List& D){
 			split1.moveNext();
 		}
 	}
+	//if odd then add the last element
 	if((j+k) % 2 != 0){
 		D.insertBefore(split2.peekNext());
 	}
@@ -49,6 +62,7 @@ int main(int argc, char * argv[]){
 	}
 	int n = 0;
 	int shuffle_count = 0;
+	//make the string from command line into int
 	n = atoi(argv[1]);
 	cout << "deck size       shuffle count" << endl;
 	cout << "------------------------------" << endl;
@@ -65,13 +79,16 @@ int main(int argc, char * argv[]){
 			deck_copy.insertAfter(j);
 			deck_copy.moveNext();
 		}
+		//shuffling
 		shuffle(deck);
 		shuffle_count++;
 		while(!deck_copy.equals(deck)){
 			shuffle(deck);
 			shuffle_count++;
-		}	
+		}
+		//formatting the output	
 		cout << " " << left << setw(16) << i << right << shuffle_count <<endl;
+		//reset the decks for the next loop
 		deck.clear();
 		deck_copy.clear();
 	}

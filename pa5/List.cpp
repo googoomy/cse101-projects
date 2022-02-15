@@ -1,9 +1,19 @@
+//-----------------------------------------------------------------------------
+// James Gu
+// jjgu
+// pa5
+//
+//
+// List.cpp
+//-----------------------------------------------------------------------------
 #include <iostream>
 #include <string>
 #include "List.h"
 
+//negative value that is imposible for List
 #define DUMMY_NUM -1
 
+//Credit for constructors and deconstructors: Queue.c examples from website
 List::Node::Node(ListElement x){
 	data = x;
 	next = nullptr;
@@ -122,7 +132,6 @@ void List::moveFront(){
 	beforeCursor = frontDummy;
 	afterCursor = frontDummy->next;
 	pos_cursor = 0;
-
 }
 
    // moveBack()
@@ -293,11 +302,9 @@ void List::cleanup(){
 	int count = 0;
 	int fn = 0;
 	int curr_pos = pos_cursor;
-	//int orig_pos = pos_cursor;
-	//Node* orig_before = beforeCursor;
-	//Node* orig_after = afterCursor;
-	//int orig_size = length();
-	//for(int j = 0; j < orig_size; j++){
+	//loop through thelist and store the findNext. if there is a findNext
+	//delete it and go through the list again until 
+	//you reach the next unique element
 	while(N != backDummy){
 		moveFront();
 		fn = findNext(N->data);
@@ -318,23 +325,20 @@ void List::cleanup(){
 		}
 	}
 	
-	
+	//rewind cursor
 	moveFront();
 	for(int j = 0; j < curr_pos; j++){
 		moveNext();
 	}
-	//pos_cursor = orig_pos;
-	//afterCursor = orig_after;
-	//beforeCursor = orig_before;
 }
 	 
 	   // concat()
 	   // Returns a new List consisting of the elements of this List, followed by
 	   // the elements of L. The cursor in the returned List will be at postion 0.
-	List List::concat(const List& L) const{
-		List LL;
-		Node* N = this->frontDummy->next;
-		while(N != this->backDummy){
+List List::concat(const List& L) const{
+	List LL;
+	Node* N = this->frontDummy->next;
+	while(N != this->backDummy){
 		LL.insertBefore(N->data);
 		N = N->next;
 	}
@@ -388,7 +392,7 @@ bool List::equals(const List& R) const{
 
 
    // Overriden Operators -----------------------------------------------------
-   
+   //Credit for these operators is for Queue.cpp examples on the website
    // operator<<()
    // Inserts string representation of L into stream.
 std::ostream& operator<<( std::ostream& stream, const List& L ){
@@ -407,7 +411,6 @@ bool operator==( const List& A, const List& B ){
 List& List::operator=( const List& L ){
 	if(this != &L){
 		List temp = L;
-
 		std::swap(frontDummy, temp.frontDummy);
 		std::swap(backDummy, temp.backDummy);
 		std::swap(num_elements, temp.num_elements);
