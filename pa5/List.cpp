@@ -290,14 +290,16 @@ int List::findPrev(ListElement x){
 	   // the same two retained elements that it did before cleanup() was called.
 void List::cleanup(){
 	Node* N = frontDummy->next;
-	ListElement i = 0;
+	int i = 0;
+	int fn = 0;
 	int curr_pos = pos_cursor;
 	//int orig_size = length();
 	//for(int j = 0; j < orig_size; j++){
-	while(afterCursor != backDummy){
+	while(N != backDummy){
 		moveFront();
-		int fn = findNext(N->data);
+		findNext(N->data);
 		while(true){
+			fn = findNext(N->data);
 			if(fn == -1){
 				break;
 			}
@@ -311,13 +313,13 @@ void List::cleanup(){
 		}
 		N = frontDummy->next;
 		i++;
-		for(int k = 0; k < i; k++){
+		for(int j = 0; j < i; j++){
 			N = N->next;
 		}
 	}
 	
 	moveFront();
-	for(int k = 0; k < curr_pos; k++){
+	for(int j = 0; j < curr_pos; j++){
 		moveNext();
 	}
 }
@@ -347,14 +349,16 @@ void List::cleanup(){
    // Credit: to_string() from Queue.cpp in the examples
 std::string List::to_string() const{
 	Node* N = nullptr;
-	std::string s = "";
+	std::string s = "(";
 
-	for(N = frontDummy->next; N != nullptr; N = N->next){
+	for(N = frontDummy->next; N != backDummy; N = N->next){
 		if(N->next == backDummy){
-			s += std::to_string(N->data);	
+			s += std::to_string(N->data);
+			break;	
 		}
 		s += std::to_string(N->data)+", ";
 	}
+	s += ")";
 	return s;
 }
 
