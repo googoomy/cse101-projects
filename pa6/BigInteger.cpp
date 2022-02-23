@@ -32,12 +32,22 @@ BigInteger::BigInteger(std::string s){
 	if(s[0] != '+' && s[0] != '-' && !std::isdigit(s[0])){
 		throw std::invalid_argument("BigInteger: Constructor: non-numeric string");
 	}
+	bool all_zeroes = true;
 	int num_digits = 0;	
 	for(int i = 1; i <= s.length(); i++){
 		num_digits++;
 		if(!std::isdigit(s[i])){
 			throw std::invalid_argument("BigInteger: Constructor: non-numeric string");
 		}
+		int curr_char = atoi(s[i]);
+		if(curr_char != 0){
+			all_zeroes = false;
+		}
+	}
+	if(all_zeroes){
+		signum = 0;
+		digits = new List();
+		return;
 	}
 	if(s[0] == '-'){
 		signum = -1;
@@ -165,16 +175,110 @@ void BigInteger::negate(){
 	signum *= -1;
 }
 
+void normalizeList(List& L){
+	List norm;
+	L.moveFront();
+	//make the terms negative if the are below base.
+	//example: 21+71= 92 and when normalizing it you need to add 100 instead so to keep it as subtracting 100 we willmake 92 negative and make it positive later
+	while(L.index() != -1){
+		if(L.get() < base){
+			L.set(L.get()*-1);
+		}
+		L.moveNext();
+	}
+	//normalize each value by subtracting 100
+	L.moveBack();
+	long carry = 0;
+	while(L.index() != -1){
+		L.set(L.get()+carry-base);
+		if(L.get() < 0){
+			L.set(L.get()*-1);
+		}
+		if(L.get() < base){
+			carry = 1;
+		}
+		if(L.get() > base){
+			L.set(L.get()%base);	
+			carry = 0;
+		}
+		L.movePrev();
+	}
+	//if there is a leftover carry by the end
+	if(carry != 0){
+		L.moveFront();
+		L.insertBefore(carry);
+	}
+}
+
+void sumList(List& S, List A, List B, int sgn){
+	if(sgn == 1){
+		
+	}
+	if(sgn == -1){
+		
+	}
+}
 
    // BigInteger Arithmetic operations ----------------------------------------
 
    // add()
    // Returns a BigInteger representing the sum of this and N.
-   BigInteger add(const BigInteger& N) const;
+BigInteger BigInteger::add(const BigInteger& N) const{
+	if(N.sign() == 0){
+		BigInteger CPY = BigInteger(this);
+		return CPY;
+	}
+	if(this.sign() == 0){
+		BigInteger CPY = BigInteger(N);
+		return CPY;
+	}
+	BigInteger sum;
+	int sgn = 1;
+	if(N.sign() == -1 && this.sign() == 1){
+		sgn = -1;
+		N.negate();
+		sumList(sum->digits, this->digits, N->digits, sgn);
+		if(this.compare(N) == -1){
+			sum->signum = -1;
+		}else if(this.compare(N) == 1){
+			sum->signum = 1;
+		}else{
+			sum->signum = 0;
+		}
+		N.negate();
+	}else if(N.sign() == 1 && this.sign() == -1){
+		sgn = -1;
+		this.negate();
+		sumList(sum->digits, N->digits, this->digits, sgn);
+		if(this.compare(N) == -1){
+			sum->signum = 1;
+		}else if(this.compare(N) == 1){
+			sum->signum = -1;
+		}else{
+			sum->signum = 0;
+		}
+		this.negate();
+	}else{
+		sgn = 1;
+		sumList(sum->digits, this->digits, N->digits, sgn);
+		if(N.sign() == -1){
+			sum->signum = -1;
+		}else{
+			sum->signum = 1;
+		}	
+	}
+	return sum;
+}
 
    // sub()
    // Returns a BigInteger representing the difference of this and N.
-   BigInteger sub(const BigInteger& N) const;
+BigInteger BigInteger::sub(const BigInteger& N) const{
+	N.negate();
+	BigInteger diff;
+	diff = this.BigInteger::add(N);
+	N.negate();
+	return diff;
+}
 
    // mult()
    // Returns a BigInteger representing the product of this and N. 
