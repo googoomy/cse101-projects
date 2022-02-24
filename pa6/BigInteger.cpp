@@ -385,7 +385,28 @@ BigInteger mult(const BigInteger& N) const{
    // base 10 digits. If this BigInteger is negative, the returned string 
    // will begin with a negative sign '-'. If this BigInteger is zero, the
    // returned string will consist of the character '0' only.
-   std::string to_string();
+std::string to_string(){
+	std::string str = "";
+	if(sign() == -1){
+		str+="-";
+	}
+	if(sign() == 0){
+		str = "0";
+		return str;
+	}
+	bool first_iter = true;
+	moveBack();
+	while(peekPrev() != -1){
+		std::string curr_num = std::to_string(peekPrev());
+		if(curr_num.std::length() < power && !first_iter){
+			for(int i = 0; i < power-curr_num.std::length(); i++){
+				str+="0";
+			}
+		}
+		str+=curr_num;
+		movePrev();
+	}
+}
 
 
    // Overriden Operators -----------------------------------------------------
