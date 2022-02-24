@@ -347,10 +347,34 @@ BigInteger BigInteger::sub(const BigInteger& N) const{
 	return diff;
 }
 
+void scalarMultList(List& L, ListElement m){
+	L.moveFront();
+	while(L.peekNext() != -1){
+		L.setAfter(L.peekNext()*m);
+		L.moveNext();
+	}
+}
+
    // mult()
    // Returns a BigInteger representing the product of this and N. 
 BigInteger mult(const BigInteger& N) const{
+	N.moveFront();
+	BigInteger prod;
+	BigInteger copy;
+	num_shifts = 0;
+	while(N.peekNext() != -1){
+		copy.moveFront();
+		copy = BigInteger(this);
+		for(int i = 0; i < num_shifts; i++){
+			copy.insertBefore(0);
+			copy.moveNext();
+		}	
+		scalarMultList(copy, N.peekNext());
+		prod = prod.add(copy);
+		copy.clear();
 
+	}
+	return prod;
 }
 
 
