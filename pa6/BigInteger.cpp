@@ -74,8 +74,8 @@ BigInteger::BigInteger(std::string s){
 	}
 	//remove leading zeros
 	digits.moveBack();
-	while(digits.get()==0){
-		digits.deleteBack();
+	while(digits.peekPrev()==0){
+		digits.eraseBack();
 		digits.moveBack();	
 	}	
 	
@@ -135,20 +135,20 @@ int BigInteger::compare(const BigInteger& N) const{
 	}
 	digits.moveFront();
 	N->digits.moveFront();
-	while(digits.index() != -1 && N.digits.index() != -1){
+	while(digits.peekNext != -1 && N.digits.peekNext() != -1){
 		if(sign() == 1 && N.sign() == 1){
-			if(digits.get() > N->digits.get()){
+			if(digits.peekNext() > N->digits.peekNext()){
 				return 1;
 			}
-			if(digits.get() < N->digits.get()){
+			if(digits.peekNext() < N->digits.peekNext()){
 				return -1;
 			}
 		}
 		if(sign() == -1 && N.sign() == -1){
-			if(digits.get() > N->digits.get()){
+			if(digits.peekNext() > N->digits.peekNext()){
 				return -1;
 			}
-			if(digits.get() < N->digits.get()){
+			if(digits.peekNext() < N->digits.peekNext()){
 				return 1;
 			}
 		}
@@ -176,46 +176,113 @@ void BigInteger::negate(){
 }
 
 void normalizeList(List& L){
-	List norm;
+	//L.moveFront();
+		//make the terms negative if the are below base.
+		//example: 21+71= 92 and when normalizing it you need to add 100 instead so to keep it as subtracting 100 we willmake 92 negative and make it positive later
+		/*
+		while(L.peekNext() != -1){
+			if(L.peekNext() < base){
+				L.setAfter(L.peekNext()*-1);
+			}
+			L.moveNext();
+		}
+		*/
+		//normalize each value by subtracting 100
 	L.moveFront();
-	//make the terms negative if the are below base.
-	//example: 21+71= 92 and when normalizing it you need to add 100 instead so to keep it as subtracting 100 we willmake 92 negative and make it positive later
-	while(L.index() != -1){
-		if(L.get() < base){
-			L.set(L.get()*-1);
+	long carry = 0;
+	long orig = 0;
+	while(L.peekNext() != -1){
+		//L.setNext(L.peekNext()+carry-base);
+		if(L.peekNext() < 0){
+			//L.setNext(L.peekNext()*-1);
+			orig = L.peekNext();
+			L.setAfter(L.peekNext()+carry+base);
+			//carry = -1;
+			carry = orig/base;
+			if(carry == 0){
+				carry = -1;
+			}
+			
+		}else if(L.peekNext() < base){
+			orig = L.peekNext();
+			L.setAfter(L.peekNext()+carry);
+			//carry = 0;
+			carry = orig/base;
+		}else if(L.peekNext() > base){
+			orig = L.peekNext();
+			L.setNext(L.peekNext()+carry-base);	
+			//carry = 1;
+			carry = orig/base;
 		}
 		L.moveNext();
 	}
-	//normalize each value by subtracting 100
-	L.moveBack();
-	long carry = 0;
-	while(L.index() != -1){
-		L.set(L.get()+carry-base);
-		if(L.get() < 0){
-			L.set(L.get()*-1);
-		}
-		if(L.get() < base){
-			carry = 1;
-		}
-		if(L.get() > base){
-			L.set(L.get()%base);	
-			carry = 0;
-		}
-		L.movePrev();
-	}
 	//if there is a leftover carry by the end
 	if(carry != 0){
-		L.moveFront();
-		L.insertBefore(carry);
+		L.moveBack();
+		L.insertAfter(carry);
 	}
+
 }
 
 void sumList(List& S, List A, List B, int sgn){
+	S.clear();
 	if(sgn == 1){
-		
+		S.moveFront();
+		A.moveFront();
+		B.moveFront();
+		int greatest_length = 0;
+		if(A.length() > B.length()){
+			greatest_length = A.length();
+		}else{
+			greatest_length = B.length();
+		}
+		for(int i = 0; i < greatest_length; i++){
+			if(A.peekNext() == -1 && B.peekNext() == -1){
+				break;
+			}
+			if(A.peekNext() != -1 && B.peekNext() != -1){
+				S.insertBefore(A.peekNext()+B.peekNext());
+				A.moveNext();
+				B.moveNext();
+			}else if(A.peekNext == -1){
+				S.insertBefore(B.peekNext());
+				B.moveNext();
+			}else{
+				S.insertBefore(A.peekNext());
+				A.moveNext();
+			}
+			S.moveNext();
+		}
+		normalizeList(S);
 	}
 	if(sgn == -1){
-		
+		S.moveFront();	
+		A.moveFront();
+		B.moveFront();
+		int greatest_length = 0;
+		if(A.length() > B.length()){
+			greatest_length = A.length();
+		}else{
+			greatest_length = B.length();
+		}
+		for(int i = 0; i < greatest_length; i++){
+			if(A.peekNext() == -1 && B.peekNext() == -1){
+				break;
+			}
+			if(A.peekNext() != -1 && B.peekNext() != -1){
+				S.insertBefore(A.peekNext()-B.peekNext());
+				A.moveNext();
+				B.moveNext();
+			}else if(A.peekNext == -1){
+				S.insertBefore(0-B.peekNext());
+				B.moveNext();
+			}else{
+				S.insertBefore(A.peekNext());
+				A.moveNext();
+			}
+			S.moveNext();
+		}
+		normalizeList(S);
 	}
 }
 
@@ -275,14 +342,16 @@ BigInteger BigInteger::add(const BigInteger& N) const{
 BigInteger BigInteger::sub(const BigInteger& N) const{
 	N.negate();
 	BigInteger diff;
-	diff = this.BigInteger::add(N);
+	diff = this.add(N);
 	N.negate();
 	return diff;
 }
 
    // mult()
    // Returns a BigInteger representing the product of this and N. 
-   BigInteger mult(const BigInteger& N) const;
+BigInteger mult(const BigInteger& N) const{
+
+}
 
 
    // Other Functions ---------------------------------------------------------
