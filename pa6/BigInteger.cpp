@@ -71,6 +71,7 @@ BigInteger::BigInteger(std::string s){
 		long curr_num = atol(temp_s);
 		digits.insertBefore(curr_num);
 		digits.moveNext();
+		temp_s = "";
 	}
 	//remove leading zeros
 	digits.moveBack();
@@ -413,51 +414,83 @@ std::string to_string(){
    
    // operator<<()
    // Inserts string representation of N into stream.
-   friend std::ostream& operator<<( std::ostream& stream, BigInteger N );
+std::ostream& operator<<( std::ostream& stream, BigInteger N ){
+	return stream << N.BigInteger::to_string();
+}
 
    // operator==()
    // Returns true if and only if A equals B. 
-   friend bool operator==( const BigInteger& A, const BigInteger& B );
+bool operator==( const BigInteger& A, const BigInteger& B ){
+	return (A.BigInteger::compare(B) == 0);
+}
 
    // operator<()
    // Returns true if and only if A is less than B. 
-   friend bool operator<( const BigInteger& A, const BigInteger& B );
+bool operator<( const BigInteger& A, const BigInteger& B ){
+	return (A.BigInteger::compare(B) == -1);
+}
 
    // operator<=()
    // Returns true if and only if A is less than or equal to B. 
-   friend bool operator<=( const BigInteger& A, const BigInteger& B );
+bool operator<=( const BigInteger& A, const BigInteger& B ){
+	if(A.BigInteger::compare(B) == -1 || A.BigInteger::compare(B) == 0){
+		return true;
+	}
+	return false;
+}
 
    // operator>()
    // Returns true if and only if A is greater than B. 
-   friend bool operator>( const BigInteger& A, const BigInteger& B );
+bool operator>( const BigInteger& A, const BigInteger& B ){
+	return (A.BigInteger::compare(B) == 1);
+}
 
    // operator>=()
    // Returns true if and only if A is greater than or equal to B. 
-   friend bool operator>=( const BigInteger& A, const BigInteger& B );
-
+bool operator>=( const BigInteger& A, const BigInteger& B ){
+	if(A.BigInteger::compare(B) == 1 || A.BigInteger::compare(B) == 0){
+		return true;
+	}
+	return false;
+}
    // operator+()
    // Returns the sum A+B. 
-   friend BigInteger operator+( const BigInteger& A, const BigInteger& B );
+BigInteger BigInteger::operator+( const BigInteger& A, const BigInteger& B ){
+	return A.BigInteger::add(B);
+}
 
    // operator+=()
    // Overwrites A with the sum A+B. 
-   friend BigInteger operator+=( BigInteger& A, const BigInteger& B );
+BigInteger BigInteger::operator+=( BigInteger& A, const BigInteger& B ){
+	A = A.BigInteger::add(B);
+	return A;
+}
 
    // operator-()
    // Returns the difference A-B. 
-   friend BigInteger operator-( const BigInteger& A, const BigInteger& B );
+BigInteger BigInteger::operator-( const BigInteger& A, const BigInteger& B ){
+	return A.BigInteger::sub(B);
+}
 
    // operator-=()
    // Overwrites A with the difference A-B. 
-   friend BigInteger operator-=( BigInteger& A, const BigInteger& B );
+BigInteger BigInteger::operator-=( BigInteger& A, const BigInteger& B ){
+	A = A.BigInteger::sub(B);
+	return A;
+}
 
    // operator*()
    // Returns the product A*B. 
-   friend BigInteger operator*( const BigInteger& A, const BigInteger& B );
+BigInteger BigInteger::operator*( const BigInteger& A, const BigInteger& B ){
+	return A.BigInteger::mult(B);
+}
 
    // operator*=()
    // Overwrites A with the product A*B. 
-   friend BigInteger operator*=( BigInteger& A, const BigInteger& B );
+BigInteger BigInteger::operator*=( BigInteger& A, const BigInteger& B ){
+	A = A.BigInteger::mult(B);
+	return A;
+}
 
-};
+
 
