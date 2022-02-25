@@ -59,6 +59,7 @@ BigInteger::BigInteger(std::string s){
 	}
 	std::string temp_s = "";
 	digits = List();
+	/*
 	digits.moveFront();
 	//ceiling of num_digits/power and num_digits/num_entries without math.h
 	int num_entries = (num_digits/power) + ((num_digits % power) != 0);
@@ -77,6 +78,81 @@ BigInteger::BigInteger(std::string s){
 		//digits.moveNext();
 		temp_s = "";
 	}
+	if(curr < (int)(s.length())){
+		for(int j = 0; j < num_digits_per_entry; j++){
+			temp_s += s[curr];
+			curr+=1;
+			if(curr >= (int)(s.length())){
+				break;
+			}
+		}
+		long curr_num = stol(temp_s, nullptr, 10);
+		digits.insertAfter(curr_num);
+	}
+*/
+	digits.moveBack();
+	//ceiling of num_digits/power and num_digits/num_entries without math.h
+	int num_entries = (num_digits/power) + ((num_digits % power) != 0);
+	int num_digits_per_entry = (num_digits/num_entries) + ((num_digits % num_entries) != 0);
+	int curr = s.length();
+	std::string s_c = s;
+	if(s[0] != '-' && s[0] != '+'){
+		s_c.insert(0, "-");
+	}
+	bool break_called = false;
+	for(int i = 0; i < num_entries; i++){
+		for(int j = 0; j < num_digits_per_entry; j++){
+			if(s_c[curr] == '-' || s_c[curr] == '+'){
+				break_called = true;
+				break;
+			}
+			/*
+			std::string char_to_str = "" + s_c[curr];
+			temp_s.insert(0, char_to_str);
+			*/
+			temp_s += s_c[curr];
+			curr-=1;
+		}
+		for(int k = 0; k < (int)(temp_s.length() / 2); k++){
+			std::swap(temp_s[k], temp_s[temp_s.length() - k - 1]);
+		}
+		long curr_num = stol(temp_s, nullptr, 10);
+		digits.insertBefore(curr_num);
+		//digits.moveNext();
+		//digits.moveBack();
+		temp_s = "";
+		if(break_called){
+			break;
+		}
+	}
+	if(curr > 0){
+		for(int j = 0; j < num_digits_per_entry; j++){
+			if(s_c[curr] == '-' || s_c[curr] == '+'){
+				break_called = true;
+				break;
+			}
+			/*
+			std::string char_to_str = "" + s_c[curr];
+			temp_s.insert(0, char_to_str);
+			*/
+			temp_s += s_c[curr];
+			curr-=1;
+			if(curr <= 0){
+				break;
+			}
+			if(break_called){
+				break;
+			}
+		}
+		for(int k = 0; k < (int)(temp_s.length() / 2); k++){
+			std::swap(temp_s[k], temp_s[temp_s.length() - k - 1]);
+		}
+		long curr_num = stol(temp_s, nullptr, 10);
+		digits.insertBefore(curr_num);
+	}
+
+
+
 	//remove leading zeros
 	digits.moveBack();
 	while(digits.peekPrev()==0 && digits.peekPrev() != -1){
@@ -302,10 +378,12 @@ void sumList(List& S, List A, List B, int sgn){
 BigInteger BigInteger::add(const BigInteger& N) const{
 	if(N.sign() == 0){
 		BigInteger CPY = BigInteger(*this);
+		normalizeList(CPY.digits);
 		return CPY;
 	}
 	if(this->sign() == 0){
 		BigInteger CPY = BigInteger(N);
+		normalizeList(CPY.digits);
 		return CPY;
 	}
 	BigInteger sum;
@@ -345,6 +423,10 @@ BigInteger BigInteger::add(const BigInteger& N) const{
 			sum.signum = 1;
 		}	
 	}
+	BigInteger zero;
+	if(zero.compare(sum) == 0){
+		sum.signum = 0;
+	}
 	return sum;
 }
 
@@ -356,12 +438,17 @@ BigInteger BigInteger::sub(const BigInteger& N) const{
 	BigInteger diff;
 	diff = this->add(CPY);;
 	CPY.negate();
+	BigInteger zero;
+	if(zero.compare(diff) == 0){
+		diff.signum = 0;
+	}
 	return diff;
 }
 
 void scalarMultList(List& L, ListElement m){
 	L.moveFront();
-	while(L.peekNext() != -1){
+	//while(L.peekNext() != -1){
+	for(int i = 0; i < L.length(); i++){
 		L.setAfter(L.peekNext()*m);
 		L.moveNext();
 	}
@@ -371,22 +458,42 @@ void scalarMultList(List& L, ListElement m){
    // Returns a BigInteger representing the product of this and N. 
 BigInteger BigInteger::mult(const BigInteger& N) const{
 	BigInteger CPY = BigInteger(N);
+	if(CPY.signum == 0 || this->signum == 0){
+		BigInteger zero;
+		return zero;
+	}
 	CPY.digits.moveFront();
 	BigInteger prod;
+	//bool first_iter = true;
+	//BigInteger copy = BigInteger(*this);
 	BigInteger copy;
 	int num_shifts = 0;
-	while(CPY.digits.peekNext() != -1){
+	//while(CPY.digits.peekNext() != -1){
+	for(int i = 0; i < CPY.digits.length(); i++){
 		copy = BigInteger(*this);
 		copy.digits.moveFront();
 		for(int i = 0; i < num_shifts; i++){
 			copy.digits.insertBefore(0);
 			copy.digits.moveFront();
-		}	
+		}/*
+		if(!first_iter){
+			copy.digits.moveFront();
+			copy.digits.insertBefore(0);
+		}
+	*/	
 		scalarMultList(copy.digits, CPY.digits.peekNext());
+		
+		/*
+		copy.digits.moveFront();
+		for(int i = 0; i < num_shifts; i++){
+			copy.digits.insertBefore(0);
+			copy.digits.moveFront();
+		}*/
 		prod = prod.add(copy);
 		copy.digits.clear();
 		CPY.digits.moveNext();
-
+		num_shifts+=1;
+		//first_iter = false;
 	}
 	return prod;
 }
@@ -400,10 +507,13 @@ BigInteger BigInteger::mult(const BigInteger& N) const{
    // will begin with a negative sign '-'. If this BigInteger is zero, the
    // returned string will consist of the character '0' only.
 std::string BigInteger::to_string(){
+	//std::cerr << digits.front() << std::endl;
 	std::string str = "";
+	/*
 	if(sign() == -1){
 		str+="-";
 	}
+	*/
 	if(sign() == 0){
 		str = "0";
 		return str;
@@ -422,6 +532,9 @@ std::string BigInteger::to_string(){
 		}
 		str+=curr_num;
 		digits.movePrev();
+	}
+	if(sign() == -1 && std::isdigit(str[0])){
+		str.insert(0, "-");
 	}
 	return str;
 }

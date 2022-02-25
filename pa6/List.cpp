@@ -155,8 +155,9 @@ void List::moveBack(){
    // pre: position()<length() 
 ListElement List::moveNext(){
 	if(position() >= length()){
-		std::cerr << "List: moveNext(): no next element in List" << std::endl;
-		return (EXIT_FAILURE);
+		//std::cerr << "List: moveNext(): no next element in List" << std::endl;
+		//return (EXIT_FAILURE);
+		return -1;
 	}
 	pos_cursor++;
 	beforeCursor = beforeCursor->next;
