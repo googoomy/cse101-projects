@@ -10,7 +10,7 @@
 
 int power = 9;
 long base = 1000000000;
-
+ 
    // Class Constructors & Destructors ----------------------------------------
 
    // BigInteger()
@@ -18,7 +18,7 @@ long base = 1000000000;
    // signum=0, digits=().
 BigInteger::BigInteger(){
 	signum = 0;
-	digits = new List();
+	digits = List();
 }
 
    // BigInteger()
@@ -30,23 +30,26 @@ BigInteger::BigInteger(std::string s){
 		throw std::invalid_argument("BigInteger: Contructor: empty string");
 	}
 	if(s[0] != '+' && s[0] != '-' && !std::isdigit(s[0])){
+		//std::cerr << "hi";
 		throw std::invalid_argument("BigInteger: Constructor: non-numeric string");
 	}
 	bool all_zeroes = true;
 	int num_digits = 0;	
-	for(int i = 1; i <= s.length(); i++){
+	for(size_t j = 1; j < s.length(); j++){
 		num_digits++;
-		if(!std::isdigit(s[i])){
+		if(!std::isdigit(s[j])){
+			//std::cerr << "bye";
 			throw std::invalid_argument("BigInteger: Constructor: non-numeric string");
 		}
-		int curr_char = atoi(s[i]);
+		char dgt = s[j];
+		int curr_char = atoi(&dgt);
 		if(curr_char != 0){
 			all_zeroes = false;
 		}
 	}
 	if(all_zeroes){
 		signum = 0;
-		digits = new List();
+		digits = List();
 		return;
 	}
 	if(s[0] == '-'){
@@ -55,7 +58,7 @@ BigInteger::BigInteger(std::string s){
 		signum = 1;
 	}
 	std::string temp_s = "";
-	digits = newList();
+	digits = List();
 	digits.moveFront();
 	//ceiling of num_digits/power and num_digits/num_entries without math.h
 	int num_entries = (num_digits/power) + ((num_digits % power) != 0);
@@ -67,18 +70,21 @@ BigInteger::BigInteger(std::string s){
 	for(int i = 0; i < num_entries; i++){
 		for(int j = 0; j < num_digits_per_entry; j++){
 			temp_s += s[curr];
+			curr+=1;
 		}
-		long curr_num = atol(temp_s);
-		digits.insertBefore(curr_num);
-		digits.moveNext();
+		long curr_num = stol(temp_s, nullptr, 10);
+		digits.insertAfter(curr_num);
+		//digits.moveNext();
 		temp_s = "";
 	}
 	//remove leading zeros
 	digits.moveBack();
-	while(digits.peekPrev()==0){
-		digits.eraseBack();
+	while(digits.peekPrev()==0 && digits.peekPrev() != -1){
+		
+		digits.eraseBefore();
 		digits.moveBack();	
-	}	
+	}
+	
 	
 
 	
@@ -116,45 +122,47 @@ int BigInteger::compare(const BigInteger& N) const{
 		return -1;
 	}
 	if(sign() == 1 && N.sign() == 1){		
-		if(length(this->digits) > length(N.digits)){
+		if(digits.length() > N.digits.length()){
 			return 1;
 		}
-		if(length(this->digits) < length(N.digits)){
+		if(digits.length() < N.digits.length()){
 			return -1;
 		}
 	}
 	if(sign() == -1 && N.sign() == -1){		
-		if(length(this->digits) > length(N.digits)){
+		if(digits.length() > N.digits.length()){
 			return -1;
 		}
-		if(length(this->digits) < length(N.digits)){
+		if(digits.length() < N.digits.length()){
 			return 1;
 		}
 	}
 	if(signum == 0 && N.signum == 0){
 		return 0;
 	}
-	digits.moveFront();
-	N->digits.moveFront();
-	while(digits.peekNext != -1 && N.digits.peekNext() != -1){
+	List digits_c = this->digits;
+	List N_digits = N.digits;
+	digits_c.moveFront();
+	N_digits.moveFront();
+	while(digits_c.peekNext() != -1 && N_digits.peekNext() != -1){
 		if(sign() == 1 && N.sign() == 1){
-			if(digits.peekNext() > N->digits.peekNext()){
+			if(digits_c.peekNext() > N_digits.peekNext()){
 				return 1;
 			}
-			if(digits.peekNext() < N->digits.peekNext()){
+			if(digits_c.peekNext() < N_digits.peekNext()){
 				return -1;
 			}
 		}
 		if(sign() == -1 && N.sign() == -1){
-			if(digits.peekNext() > N->digits.peekNext()){
+			if(digits_c.peekNext() > N_digits.peekNext()){
 				return -1;
 			}
-			if(digits.peekNext() < N->digits.peekNext()){
+			if(digits_c.peekNext() < N_digits.peekNext()){
 				return 1;
 			}
 		}
-		digits.moveNext();
-		N->digits.moveNext();
+		digits_c.moveNext();
+		N_digits.moveNext();
 	}
 	return 0;
 }
@@ -211,7 +219,7 @@ void normalizeList(List& L){
 			carry = orig/base;
 		}else if(L.peekNext() > base){
 			orig = L.peekNext();
-			L.setNext(L.peekNext()+carry-base);	
+			L.setAfter(L.peekNext()+carry-base);	
 			//carry = 1;
 			carry = orig/base;
 		}
@@ -245,7 +253,7 @@ void sumList(List& S, List A, List B, int sgn){
 				S.insertBefore(A.peekNext()+B.peekNext());
 				A.moveNext();
 				B.moveNext();
-			}else if(A.peekNext == -1){
+			}else if(A.peekNext() == -1){
 				S.insertBefore(B.peekNext());
 				B.moveNext();
 			}else{
@@ -274,7 +282,7 @@ void sumList(List& S, List A, List B, int sgn){
 				S.insertBefore(A.peekNext()-B.peekNext());
 				A.moveNext();
 				B.moveNext();
-			}else if(A.peekNext == -1){
+			}else if(A.peekNext() == -1){
 				S.insertBefore(0-B.peekNext());
 				B.moveNext();
 			}else{
@@ -293,46 +301,48 @@ void sumList(List& S, List A, List B, int sgn){
    // Returns a BigInteger representing the sum of this and N.
 BigInteger BigInteger::add(const BigInteger& N) const{
 	if(N.sign() == 0){
-		BigInteger CPY = BigInteger(this);
+		BigInteger CPY = BigInteger(*this);
 		return CPY;
 	}
-	if(this.sign() == 0){
+	if(this->sign() == 0){
 		BigInteger CPY = BigInteger(N);
 		return CPY;
 	}
 	BigInteger sum;
 	int sgn = 1;
-	if(N.sign() == -1 && this.sign() == 1){
+	if(N.sign() == -1 && this->sign() == 1){
 		sgn = -1;
-		N.negate();
-		sumList(sum->digits, this->digits, N->digits, sgn);
-		if(this.compare(N) == -1){
-			sum->signum = -1;
-		}else if(this.compare(N) == 1){
-			sum->signum = 1;
+		BigInteger CPY = BigInteger(N);
+		CPY.negate();
+		sumList(sum.digits, this->digits, CPY.digits, sgn);
+		if(this->compare(CPY) == -1){
+			sum.signum = -1;
+		}else if(this->compare(CPY) == 1){
+			sum.signum = 1;
 		}else{
-			sum->signum = 0;
+			sum.signum = 0;
 		}
-		N.negate();
-	}else if(N.sign() == 1 && this.sign() == -1){
+		CPY.negate();
+	}else if(N.sign() == 1 && this->sign() == -1){
 		sgn = -1;
-		this.negate();
-		sumList(sum->digits, N->digits, this->digits, sgn);
-		if(this.compare(N) == -1){
-			sum->signum = 1;
-		}else if(this.compare(N) == 1){
-			sum->signum = -1;
+		BigInteger CPY = BigInteger(*this);
+		CPY.negate();
+		sumList(sum.digits, N.digits, CPY.digits, sgn);
+		if(CPY.compare(N) == -1){
+			sum.signum = 1;
+		}else if(CPY.compare(N) == 1){
+			sum.signum = -1;
 		}else{
-			sum->signum = 0;
+			sum.signum = 0;
 		}
-		this.negate();
+		CPY.negate();
 	}else{
 		sgn = 1;
-		sumList(sum->digits, this->digits, N->digits, sgn);
+		sumList(sum.digits, this->digits, N.digits, sgn);
 		if(N.sign() == -1){
-			sum->signum = -1;
+			sum.signum = -1;
 		}else{
-			sum->signum = 1;
+			sum.signum = 1;
 		}	
 	}
 	return sum;
@@ -341,10 +351,11 @@ BigInteger BigInteger::add(const BigInteger& N) const{
    // sub()
    // Returns a BigInteger representing the difference of this and N.
 BigInteger BigInteger::sub(const BigInteger& N) const{
-	N.negate();
+	BigInteger CPY = BigInteger(N);
+	CPY.negate();
 	BigInteger diff;
-	diff = this.add(N);
-	N.negate();
+	diff = this->add(CPY);;
+	CPY.negate();
 	return diff;
 }
 
@@ -358,21 +369,23 @@ void scalarMultList(List& L, ListElement m){
 
    // mult()
    // Returns a BigInteger representing the product of this and N. 
-BigInteger mult(const BigInteger& N) const{
-	N.moveFront();
+BigInteger BigInteger::mult(const BigInteger& N) const{
+	BigInteger CPY = BigInteger(N);
+	CPY.digits.moveFront();
 	BigInteger prod;
 	BigInteger copy;
-	num_shifts = 0;
-	while(N.peekNext() != -1){
-		copy.moveFront();
-		copy = BigInteger(this);
+	int num_shifts = 0;
+	while(CPY.digits.peekNext() != -1){
+		copy = BigInteger(*this);
+		copy.digits.moveFront();
 		for(int i = 0; i < num_shifts; i++){
-			copy.insertBefore(0);
-			copy.moveNext();
+			copy.digits.insertBefore(0);
+			copy.digits.moveFront();
 		}	
-		scalarMultList(copy, N.peekNext());
+		scalarMultList(copy.digits, CPY.digits.peekNext());
 		prod = prod.add(copy);
-		copy.clear();
+		copy.digits.clear();
+		CPY.digits.moveNext();
 
 	}
 	return prod;
@@ -386,7 +399,7 @@ BigInteger mult(const BigInteger& N) const{
    // base 10 digits. If this BigInteger is negative, the returned string 
    // will begin with a negative sign '-'. If this BigInteger is zero, the
    // returned string will consist of the character '0' only.
-std::string to_string(){
+std::string BigInteger::to_string(){
 	std::string str = "";
 	if(sign() == -1){
 		str+="-";
@@ -396,17 +409,21 @@ std::string to_string(){
 		return str;
 	}
 	bool first_iter = true;
-	moveBack();
-	while(peekPrev() != -1){
-		std::string curr_num = std::to_string(peekPrev());
-		if(curr_num.std::length() < power && !first_iter){
-			for(int i = 0; i < power-curr_num.std::length(); i++){
+	digits.moveBack();
+	while(digits.peekPrev() != -1){
+		std::string curr_num = std::to_string(digits.peekPrev());
+		if((int)(curr_num.length()) < power && !first_iter){
+			for(int i = 0; i < (int)(power-curr_num.length()); i++){
 				str+="0";
 			}
 		}
+		if(first_iter){
+			first_iter = false;
+		}
 		str+=curr_num;
-		movePrev();
+		digits.movePrev();
 	}
+	return str;
 }
 
 
@@ -415,7 +432,8 @@ std::string to_string(){
    // operator<<()
    // Inserts string representation of N into stream.
 std::ostream& operator<<( std::ostream& stream, BigInteger N ){
-	return stream << N.BigInteger::to_string();
+	//return stream << N.BigInteger::to_string();
+	return stream << N.to_string();
 }
 
    // operator==()
@@ -455,40 +473,40 @@ bool operator>=( const BigInteger& A, const BigInteger& B ){
 }
    // operator+()
    // Returns the sum A+B. 
-BigInteger BigInteger::operator+( const BigInteger& A, const BigInteger& B ){
-	return A.BigInteger::add(B);
+BigInteger operator+( const BigInteger& A, const BigInteger& B ){
+	return A.add(B);
 }
 
    // operator+=()
    // Overwrites A with the sum A+B. 
-BigInteger BigInteger::operator+=( BigInteger& A, const BigInteger& B ){
-	A = A.BigInteger::add(B);
+BigInteger operator+=( BigInteger& A, const BigInteger& B ){
+	A = A.add(B);
 	return A;
 }
 
    // operator-()
    // Returns the difference A-B. 
-BigInteger BigInteger::operator-( const BigInteger& A, const BigInteger& B ){
-	return A.BigInteger::sub(B);
+BigInteger operator-( const BigInteger& A, const BigInteger& B ){
+	return A.sub(B);
 }
 
    // operator-=()
    // Overwrites A with the difference A-B. 
-BigInteger BigInteger::operator-=( BigInteger& A, const BigInteger& B ){
-	A = A.BigInteger::sub(B);
+BigInteger operator-=( BigInteger& A, const BigInteger& B ){
+	A = A.sub(B);
 	return A;
 }
 
    // operator*()
    // Returns the product A*B. 
-BigInteger BigInteger::operator*( const BigInteger& A, const BigInteger& B ){
-	return A.BigInteger::mult(B);
+BigInteger operator*( const BigInteger& A, const BigInteger& B ){
+	return A.mult(B);
 }
 
    // operator*=()
    // Overwrites A with the product A*B. 
-BigInteger BigInteger::operator*=( BigInteger& A, const BigInteger& B ){
-	A = A.BigInteger::mult(B);
+BigInteger operator*=( BigInteger& A, const BigInteger& B ){
+	A = A.mult(B);
 	return A;
 }
 

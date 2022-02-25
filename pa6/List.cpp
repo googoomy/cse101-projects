@@ -96,8 +96,11 @@ int List::position() const{
    // pre: position()<length()
 ListElement List::peekNext() const{
 	if(position() >= length()){
+		/*
 		std::cerr << "List: peekNext(): no next element in List" << std::endl;
 		return (EXIT_FAILURE);
+		*/
+		return -1;
 	}
 	return afterCursor->data;
 }
@@ -107,9 +110,13 @@ ListElement List::peekNext() const{
    // Returns the element before the cursor.
    // pre: position()>0
 ListElement List::peekPrev() const{
+	/*
 	if(position() <= 0){
 		std::cerr << "List: peekPrev(): no previous element in List" << std::endl;
 		return (EXIT_FAILURE);
+	}*/
+	if(position() <= 0){
+		return -1;
 	}
 	return beforeCursor->data;
 }
