@@ -1,3 +1,14 @@
+//-----------------------------------------------------------------------------
+// James Gu
+// jjgu
+// pa6
+//
+//
+//
+// Arithmetic.cpp
+// Client for the BigInteger ADT
+//-----------------------------------------------------------------------------
+
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -9,7 +20,7 @@ using namespace std;
 
 int main(int argc, char * argv[]){
 	ifstream in;
-	ifstream out;
+	ofstream out;
 	if(argc != 3){
 		cerr << "Usage: " << argv[0] << " <input file> <output file>" << endl;
 		return(EXIT_FAILURE);
@@ -46,18 +57,6 @@ int main(int argc, char * argv[]){
 	BigInteger nine = BigInteger("9");
 	BigInteger sixteen = BigInteger("16");
 	BigInteger nineAfourpsixteenBfive = (((((nine*A)*A)*A)*A) + (((((sixteen*B)*B)*B)*B)*B));
-/*	
-	A << "\n" << endl;
-	B << "\n" << endl;
-	ApB << "\n" << endl;
-	AmB << "\n" << endl;
-	AmA << "\n" << endl;
-	threeAmtwoB << "\n" << endl;
-	AB << "\n" << endl;
-	AA << "\n" << endl;
-	BB << "\n" << endl;
-	nineAfourpsixteenBfive << "\n" << endl;
-*/
 	
 	out << A << "\n" << endl;
 	out << B << "\n" << endl;

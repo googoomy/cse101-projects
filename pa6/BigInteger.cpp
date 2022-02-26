@@ -1,7 +1,14 @@
 //-----------------------------------------------------------------------------
+// James Gu
+// jjgu
+// pa6
+//
+//
+//
 // BigInteger.cpp
 // File for the BigInteger ADT
 //-----------------------------------------------------------------------------
+
 #include <iostream>
 #include <string>
 #include <stdexcept>
@@ -115,6 +122,11 @@ BigInteger::BigInteger(std::string s){
 		}
 		for(int k = 0; k < (int)(temp_s.length() / 2); k++){
 			std::swap(temp_s[k], temp_s[temp_s.length() - k - 1]);
+		}
+		for(int k = 0; k < (int)(temp_s.length()); k++){
+			if(!std::isdigit(temp_s[k])){
+				temp_s.erase(k);		
+			}
 		}
 		long curr_num = stol(temp_s, nullptr, 10);
 		digits.insertBefore(curr_num);
@@ -392,12 +404,15 @@ BigInteger BigInteger::add(const BigInteger& N) const{
 		sgn = -1;
 		BigInteger CPY = BigInteger(N);
 		CPY.negate();
-		sumList(sum.digits, this->digits, CPY.digits, sgn);
+		//sumList(sum.digits, this->digits, CPY.digits, sgn);
 		if(this->compare(CPY) == -1){
+			sumList(sum.digits, CPY.digits, this->digits, sgn);
 			sum.signum = -1;
 		}else if(this->compare(CPY) == 1){
+			sumList(sum.digits, this->digits, CPY.digits, sgn);
 			sum.signum = 1;
 		}else{
+			sum.digits.clear();
 			sum.signum = 0;
 		}
 		CPY.negate();
@@ -405,12 +420,15 @@ BigInteger BigInteger::add(const BigInteger& N) const{
 		sgn = -1;
 		BigInteger CPY = BigInteger(*this);
 		CPY.negate();
-		sumList(sum.digits, N.digits, CPY.digits, sgn);
+		//sumList(sum.digits, N.digits, CPY.digits, sgn);
 		if(CPY.compare(N) == -1){
+			sumList(sum.digits, N.digits, CPY.digits,sgn);
 			sum.signum = 1;
 		}else if(CPY.compare(N) == 1){
+			sumList(sum.digits, CPY.digits, N.digits, sgn);
 			sum.signum = -1;
 		}else{
+			sum.digits.clear();
 			sum.signum = 0;
 		}
 		CPY.negate();

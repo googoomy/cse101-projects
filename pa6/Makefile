@@ -37,6 +37,9 @@ $(ADT1_TEST): $(ADT1_TEST).o $(ADT1_OBJECT) $(ADT2_OBJECT)
 $(ADT2_TEST): $(ADT2_TEST).o $(ADT2_OBJECT)
 	$(LINK) $(ADT2_TEST) $(ADT2_TEST).o $(ADT2_OBJECT)
 
+BigIntegerTest : BigIntegerTest.o BigInteger.o
+	$(LINK) BigIntegerTest BigIntegerTest.o $(ADT1_OBJECT) $(ADT2_OBJECT)
+
 $(OBJECT): $(SOURCE) $(ADT1_HEADER) $(ADT2_HEADER)
 	$(COMPILE) $(SOURCE)
 
@@ -45,6 +48,9 @@ $(ADT1_TEST).o: $(ADT1_TEST).cpp $(ADT1_HEADER) $(ADT2_HEADER)
 
 $(ADT2_TEST).o: $(ADT2_TEST).cpp $(ADT2_HEADER)
 	$(COMPILE) $(ADT2_TEST).cpp
+
+BigIntegerTest.o: BigInteger.h BigIntegerTest.cpp
+	$(COMPILE) BigIntegerTest.cpp
 
 $(ADT1_OBJECT): $(ADT1_SOURCE) $(ADT1_HEADER)
 	$(COMPILE) $(ADT1_SOURCE)
