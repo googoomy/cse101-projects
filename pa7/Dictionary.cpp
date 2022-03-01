@@ -1,30 +1,41 @@
 //-----------------------------------------------------------------------------
-// Dictionary.h
-// Header file for Dictionary ADT based on a Binary Search Tree. Includes a
+// Dictionary.cpp
+// Client file for Dictionary ADT based on a Binary Search Tree. Includes a
 // built in iterator called current that can perform a smallest-to-largest
 // (forward) or a largest-to-smallest (reverse) iteration over all keys.
 //-----------------------------------------------------------------------------
-#include<iostream>
-#include<string>
+#include <iostream>
+#include <string>
 
-   // private Node struct
-struct Node{
-    // Node fields
-    keyType key;
-    valType val;
-    Node* parent;
-    Node* left;
-    Node* right;
-    // Node constructor
-    Node(keyType k, valType v);
+#include "Dictionary.h"
+
+//Node Constructor
+Dictionary::Node::Node(keyType k, valType v){
+    key = k;
+    val = v;
+    parent = nullptr;
+    left = nullptr;
+    right = nullptr;
 };
 
-   // Dictionary fields
-Node* nil;
-Node* root;
-Node* current;
-int   num_pairs;
+   // Class Constructors & Destructors ----------------------------------------
+Dictionary::Dictionary(){
+	nil = new Node("NIL", -1);
+	root = nil;
+	current = nil;
+	num_pairs = 0;
+}
 
+Dictionary::Dictionary(const Dictionary& D){
+	nil = new Node("NIL", -1);
+	root = nil;
+	current = nil;
+	num_pairs = 0;
+}
+
+Dictionary::~Dictionary(){
+	clear();
+}
    // Helper Functions (Optional) ---------------------------------------------
 
    // inOrderString()
@@ -51,58 +62,89 @@ void postOrderDelete(Node* R);
    // search()
    // Searches the subtree rooted at R for a Node with key==k. Returns
    // the address of the Node if it exists, returns nil otherwise.
-Node* search(Node* R, keyType k) const;
+Dictionary::Node* Dictionary::search(Node* R, keyType k) const{
+	if(R == this->nil || k == R->key){
+		return R;
+	}else if(k < R->key){
+		return search(R->left, k);
+	}else{
+		return search(R->right, k);
+	}
+}
 
    // findMin()
    // If the subtree rooted at R is not empty, returns a pointer to the 
    // leftmost Node in that subtree, otherwise returns nil.
-Node* findMin(Node* R);
+Node* findMin(Node* R){
+	while(R->
+}
 
    // findMax()
    // If the subtree rooted at R is not empty, returns a pointer to the 
    // rightmost Node in that subtree, otherwise returns nil.
-Node* findMax(Node* R);
+Node* findMax(Node* R){
+	while(R->right != this->nil){
+		R = R->right;
+	}
+	return R;
+}
 
    // findNext()
    // If N does not point to the rightmost Node, returns a pointer to the
    // Node after N in an in-order tree walk.  If N points to the rightmost 
    // Node, or is nil, returns nil. 
-Node* findNext(Node* N);
+Node* findNext(Node* N){
+	if(N->right != this->nil){
+		return findMin(N->right);
+	}
+	Node* next = N->parent;
+	while(next != this->nil && N == next->right){
+		N = next;
+		next = next->parent;
+	}
+	return next;
+}
 
    // findPrev()
    // If N does not point to the leftmost Node, returns a pointer to the
    // Node before N in an in-order tree walk.  If N points to the leftmost 
    // Node, or is nil, returns nil.
-Node* findPrev(Node* N);
-
-
-   // Class Constructors & Destructors ----------------------------------------
-   
-   // Creates new Dictionary in the empty state. 
-Dictionary();
-
-   // Copy constructor.
-Dictionary(const Dictionary& D);
-
-   // Destructor
-~Dictionary();
+Node* findPrev(Node* N){
+	Node prev;
+	if(N->left != this->nil){
+		prev = findPrev(N->left);
+	}else{
+		return N;
+	}
+	return prev;
+}
 
 
    // Access functions --------------------------------------------------------
 
    // size()
    // Returns the size of this Dictionary.
-int size() const;
+int Dictionary::size() const{
+	return num_pairs;
+}
 
    // contains()
    // Returns true if there exists a pair such that key==k, and returns false
    // otherwise.
-bool contains(keyType k) const;
+bool Dictionary::contains(keyType k) const{
+	return (search(this->root, k) != this->nil);
+	
+}
 
    // getValue()
    // Returns a reference to the value corresponding to key k.
    // Pre: contains(k)
-valType& getValue(keyType k) const;
+valType& Dictionary::getValue(keyType k) const{
+	Node n = search(this->root, k);
+	if(n == nullptr){
+		return 
+	}
+}
 
    // hasCurrent()
    // Returns true if the current iterator is defined, and returns false 
