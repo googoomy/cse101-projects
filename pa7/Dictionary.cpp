@@ -53,11 +53,23 @@ void preOrderString(std::string& s, Node* R) const;
    // preOrderCopy()
    // Recursively inserts a deep copy of the subtree rooted at R into this 
    // Dictionary. Recursion terminates at N.
-void preOrderCopy(Node* R, Node* N);
+void preOrderCopy(Node* R, Node* N){
+	if(R != this->nil){
+		 R;
+		preOrder
+	}
+}
 
    // postOrderDelete()
    // Deletes all Nodes in the subtree rooted at R, sets R to nil.
-void postOrderDelete(Node* R);
+void postOrderDelete(Node* R){
+	if(R != this->nil){
+		postOrderDelete(R->left);
+		postOrderDelete(R->right);
+		delete R;
+	}
+
+}
 
    // search()
    // Searches the subtree rooted at R for a Node with key==k. Returns
@@ -76,7 +88,10 @@ Dictionary::Node* Dictionary::search(Node* R, keyType k) const{
    // If the subtree rooted at R is not empty, returns a pointer to the 
    // leftmost Node in that subtree, otherwise returns nil.
 Node* findMin(Node* R){
-	while(R->
+	while(R->left != this->nil){
+		R = R->left;
+	}
+	return R;
 }
 
    // findMax()
@@ -141,7 +156,7 @@ bool Dictionary::contains(keyType k) const{
    // Pre: contains(k)
 valType& Dictionary::getValue(keyType k) const{
 	Node n = search(this->root, k);
-	if(n == nullptr){
+	if(n == this->nil){
 		return 
 	}
 }
@@ -149,12 +164,20 @@ valType& Dictionary::getValue(keyType k) const{
    // hasCurrent()
    // Returns true if the current iterator is defined, and returns false 
    // otherwise.
-bool hasCurrent() const;
+bool Dictionary::hasCurrent() const{
+	return (this->current != this->nil);
+}
 
    // currentKey()
    // Returns the current key.
    // Pre: hasCurrent() 
-keyType currentKey() const;
+keyType Dictionary::currentKey() const{
+	if(!hasCurrent){
+		throw std::invalid_argument("Dictionary: currentKey: current iterator undefined");
+		exit(EXIT_FAILURE);
+	}
+	return this->current->key;
+}
 
    // currentVal()
    // Returns a reference to the current value.
