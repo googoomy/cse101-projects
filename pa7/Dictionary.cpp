@@ -42,13 +42,29 @@ Dictionary::~Dictionary(){
    // Appends a string representation of the tree rooted at R to string s. The
    // string appended consists of: "key : value \n" for each key-value pair in
    // tree R, arranged in order by keys.
-void inOrderString(std::string& s, Node* R) const;
+void inOrderString(std::string& s, Node* R) const{
+	if(R != this->nil){
+		inOrderString(s, R->left);
+		std::string kv = "";
+		kv += R->key + " : " + std::to_string(R->val) + " \n";
+		s+=kv;
+		inOrderString(s, R->right);
+	}
+}
 
    // preOrderString()
    // Appends a string representation of the tree rooted at R to s. The appended
    // string consists of keys only, separated by "\n", with the order determined
    // by a pre-order tree walk.
-void preOrderString(std::string& s, Node* R) const;
+void preOrderString(std::string& s, Node* R) const{
+	if(R != this->nil){
+		std::string kv = "";
+		kv += R->key + " : " + std::to_string(R->val) + " \n";
+		s+=kv;
+		preOrderString(s, R->left);
+		preOrderString(s, R->right);
+	}
+}
 
    // preOrderCopy()
    // Recursively inserts a deep copy of the subtree rooted at R into this 
@@ -125,15 +141,24 @@ Node* findNext(Node* N){
    // Node before N in an in-order tree walk.  If N points to the leftmost 
    // Node, or is nil, returns nil.
 Node* findPrev(Node* N){
-	Node prev;
 	if(N->left != this->nil){
-		prev = findPrev(N->left);
-	}else{
-		return N;
+		return findMax(N->left);
+	}
+	Node* prev = N->parent;
+	while(prev != this->nil && N == prev->left){
+		N = prev;
+		prev = prev->parent;
 	}
 	return prev;
 }
 
+/*
+void deleteKey(Node* N, keyType k){
+	if(N->left == this->nil){
+		transplant(
+	}
+}
+*/
 
    // Access functions --------------------------------------------------------
 
@@ -157,7 +182,9 @@ bool Dictionary::contains(keyType k) const{
 valType& Dictionary::getValue(keyType k) const{
 	Node n = search(this->root, k);
 	if(n == this->nil){
-		return 
+		return -1;
+	}else{
+		return n->val;
 	}
 }
 
@@ -172,7 +199,7 @@ bool Dictionary::hasCurrent() const{
    // Returns the current key.
    // Pre: hasCurrent() 
 keyType Dictionary::currentKey() const{
-	if(!hasCurrent){
+	if(!hasCurrent()){
 		throw std::invalid_argument("Dictionary: currentKey: current iterator undefined");
 		exit(EXIT_FAILURE);
 	}
@@ -182,35 +209,113 @@ keyType Dictionary::currentKey() const{
    // currentVal()
    // Returns a reference to the current value.
    // Pre: hasCurrent()
-valType& currentVal() const;
+valType& Dictionary::currentVal() const{
+	if(!hasCurrent()){
+		throw std::invalid_argument("Dictionary: currentVal: current iterator undefined");
+		exit(EXIT_FAILURE);
+	}
+	return this->current->val;
+
+}
 
 
    // Manipulation procedures -------------------------------------------------
 
    // clear()
    // Resets this Dictionary to the empty state, containing no pairs.
-void clear();
+void Dictionary::clear(){
+	if(num_pairs != 0 && this->root != this->nil){
+		postOrderDelete(this->root);
+		this->root = this->nil;
+		this->current = this->nil;
+		num_pairs = 0;
+	}
+}
 
    // setValue()
    // If a pair with key==k exists, overwrites the corresponding value with v, 
    // otherwise inserts the new pair (k, v).
-void setValue(keyType k, valType v);
+   // Credit: TreeInsert from Tantalo in Examples
+void Dictionary::setValue(keyType k, valType v){
+	Node* curr = this->nil;
+	Node* m = new Node(k, v);
+	Node* iter = this->root;
+	while(iter != this->nil){
+		curr = iter;
+		if(m->key < m->key){
+			iter = iter->left;
+		}else{
+			iter = iter->right;
+		}		
+	}
+	m->parent = curr;
+	if(curr == this->nil){
+		this->root = m;
+	}else if(m->key < curr->key){
+		curr->left = m;
+	}else{
+		curr->right = m;
+	}
+}
+
+void tranplant(Node* u, Node* v){
+	if(u->parent == this->nil){
+		this->root = v;
+	}else if(u == u-.parent->left){
+		u->parent->left = v;
+	}else{
+		u->parent->right = v;
+	}
+	if(v != this->nil){
+		v->parent = u->parent;
+	}
+}
 
    // remove()
    // Deletes the pair for which key==k. If that pair is current, then current
    // becomes undefined.
    // Pre: contains(k).
-void remove(keyType k);
+void remove(keyType k){
+	if(!contains(k)){
+		throw std::invalid_argument("Dictionary: remove: Dictionary does not contain key");
+		return(EXIT_FAILURE);
+	}
+	Node* m = search(this->root, k);
+	if(m->left == this->nil){
+		transplant(m, m->right);
+	}else if(m->right == this->nil){
+		transplant(m, m->left);
+	}else{
+		Node* min = findMin(m->right);
+		if(min->parent != m){
+			transplant(min, min->right);
+			min->right = m->right;
+			min->right->parent = min;
+		}
+		transplant(m,min);
+		min->left = m->left;
+		min->left->parent = min;
+	}
+	
+}
 
    // begin()
    // If non-empty, places current iterator at the first (key, value) pair
    // (as defined by the order operator < on keys), otherwise does nothing. 
-void begin();
+void Dictionary::begin(){
+	if(num_pairs != 0){
+		this->current = findMin(this->root);
+	}
+}
 
    // end()
    // If non-empty, places current iterator at the last (key, value) pair
    // (as defined by the order operator < on keys), otherwise does nothing. 
-void end();
+void Dictionary::end(){
+	if(num_pairs != 0){
+		this->current = findMax(this->root);
+	}
+}
 
    // next()
    // If the current iterator is not at the last pair, advances current 
@@ -253,17 +358,26 @@ bool equals(const Dictionary& D) const;
    // operator<<()
    // Inserts string representation of Dictionary D into stream, as defined by
    // member function to_string().
-friend std::ostream& operator<<( std::ostream& stream, Dictionary& D );
+std::ostream& operator<<( std::ostream& stream, Dictionary& D ){
+	return stream << D.to_string();	
+}
 
    // operator==()
    // Returns true if and only if Dictionary A equals Dictionary B, as defined
    // by member function equals(). 
-friend bool operator==( const Dictionary& A, const Dictionary& B );
+bool operator==( const Dictionary& A, const Dictionary& B ){
+	return (A.equals(B));
+}
 
    // operator=()
    // Overwrites the state of this Dictionary with state of D, and returns a
    // reference to this Dictionary.
-Dictionary& operator=( const Dictionary& D );
+Dictionary& operator=( const Dictionary& D ){
+	this.clear();
+	Dictionary E = Dictionary(D);
+	this = E;
+	return *this;
+}
 
 
 
