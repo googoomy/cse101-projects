@@ -51,6 +51,8 @@ private:
    // by a pre-order tree walk.
    void preOrderString(std::string& s, Node* R) const;
 
+   void preOrderStringNoColon(std::string& s, Dictionary& D) const;
+
    // preOrderCopy()
    // Recursively inserts a deep copy of the subtree rooted at R into this 
    // Dictionary. Recursion terminates at N.
@@ -86,6 +88,8 @@ private:
    // Node before N in an in-order tree walk.  If N points to the leftmost 
    // Node, or is nil, returns nil.
    Node* findPrev(Node* N);
+   
+   void transplant(Node* u, Node* v);
 
 public:
 

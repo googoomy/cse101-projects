@@ -30,7 +30,8 @@ Dictionary::Dictionary(const Dictionary& D){
 	nil = new Node("NIL", -1);
 	root = nil;
 	current = nil;
-	num_pairs = 0;
+	num_pairs = D.num_pairs;
+	this->preOrderCopy(D.root, nullptr);
 }
 
 Dictionary::~Dictionary(){
@@ -42,7 +43,7 @@ Dictionary::~Dictionary(){
    // Appends a string representation of the tree rooted at R to string s. The
    // string appended consists of: "key : value \n" for each key-value pair in
    // tree R, arranged in order by keys.
-void inOrderString(std::string& s, Node* R) const{
+void Dictionary::inOrderString(std::string& s, Node* R) const{
 	if(R != this->nil){
 		inOrderString(s, R->left);
 		std::string kv = "";
@@ -56,7 +57,7 @@ void inOrderString(std::string& s, Node* R) const{
    // Appends a string representation of the tree rooted at R to s. The appended
    // string consists of keys only, separated by "\n", with the order determined
    // by a pre-order tree walk.
-void preOrderString(std::string& s, Node* R) const{
+void Dictionary::preOrderString(std::string& s, Node* R) const{
 	if(R != this->nil){
 		std::string kv = "";
 		kv += R->key + " : " + std::to_string(R->val) + " \n";
@@ -66,19 +67,31 @@ void preOrderString(std::string& s, Node* R) const{
 	}
 }
 
+void Dictionary::preOrderStringNoColon(std::string& s, Dictionary& D) const{
+	Node* R = D.root;
+	if(R != this->nil){
+		std::string kv = "";
+		kv += R->key + "\n";
+		s+=kv;
+		preOrderStringNoColon(s, R->left);
+		preOrderStringNoColon(s, R->right);
+	}
+}
+
    // preOrderCopy()
    // Recursively inserts a deep copy of the subtree rooted at R into this 
    // Dictionary. Recursion terminates at N.
-void preOrderCopy(Node* R, Node* N){
-	if(R != this->nil){
-		 R;
-		preOrder
+void Dictionary::preOrderCopy(Node* R, Node* N){
+	if(R != this->nil || R == N){
+		this->setValue(R->key, R->val);
+		preOrderCopy(R->left, N);
+		preOrderCopy(R->right, N);
 	}
 }
 
    // postOrderDelete()
    // Deletes all Nodes in the subtree rooted at R, sets R to nil.
-void postOrderDelete(Node* R){
+void Dictionary::postOrderDelete(Node* R){
 	if(R != this->nil){
 		postOrderDelete(R->left);
 		postOrderDelete(R->right);
@@ -103,7 +116,7 @@ Dictionary::Node* Dictionary::search(Node* R, keyType k) const{
    // findMin()
    // If the subtree rooted at R is not empty, returns a pointer to the 
    // leftmost Node in that subtree, otherwise returns nil.
-Node* findMin(Node* R){
+Dictionary::Node* Dictionary::findMin(Node* R){
 	while(R->left != this->nil){
 		R = R->left;
 	}
@@ -113,7 +126,7 @@ Node* findMin(Node* R){
    // findMax()
    // If the subtree rooted at R is not empty, returns a pointer to the 
    // rightmost Node in that subtree, otherwise returns nil.
-Node* findMax(Node* R){
+Dictionary::Node* Dictionary::findMax(Node* R){
 	while(R->right != this->nil){
 		R = R->right;
 	}
@@ -124,7 +137,7 @@ Node* findMax(Node* R){
    // If N does not point to the rightmost Node, returns a pointer to the
    // Node after N in an in-order tree walk.  If N points to the rightmost 
    // Node, or is nil, returns nil. 
-Node* findNext(Node* N){
+Dictionary::Node* Dictionary::findNext(Node* N){
 	if(N->right != this->nil){
 		return findMin(N->right);
 	}
@@ -140,7 +153,7 @@ Node* findNext(Node* N){
    // If N does not point to the leftmost Node, returns a pointer to the
    // Node before N in an in-order tree walk.  If N points to the leftmost 
    // Node, or is nil, returns nil.
-Node* findPrev(Node* N){
+Dictionary::Node* Dictionary::findPrev(Node* N){
 	if(N->left != this->nil){
 		return findMax(N->left);
 	}
@@ -180,12 +193,12 @@ bool Dictionary::contains(keyType k) const{
    // Returns a reference to the value corresponding to key k.
    // Pre: contains(k)
 valType& Dictionary::getValue(keyType k) const{
-	Node n = search(this->root, k);
-	if(n == this->nil){
-		return -1;
-	}else{
-		return n->val;
+	if(!contains(k)){
+		throw std::invalid_argument("Dictionary: getValue: Dictionary does not contain key");
+		exit(EXIT_FAILURE);
 	}
+	Node* n = search(this->root, k);
+	return n->val;
 }
 
    // hasCurrent()
@@ -256,12 +269,13 @@ void Dictionary::setValue(keyType k, valType v){
 	}else{
 		curr->right = m;
 	}
+	this->num_pairs++;
 }
 
-void tranplant(Node* u, Node* v){
+void Dictionary::transplant(Node* u, Node* v){
 	if(u->parent == this->nil){
 		this->root = v;
-	}else if(u == u-.parent->left){
+	}else if(u == u->parent->left){
 		u->parent->left = v;
 	}else{
 		u->parent->right = v;
@@ -275,10 +289,10 @@ void tranplant(Node* u, Node* v){
    // Deletes the pair for which key==k. If that pair is current, then current
    // becomes undefined.
    // Pre: contains(k).
-void remove(keyType k){
+void Dictionary::remove(keyType k){
 	if(!contains(k)){
 		throw std::invalid_argument("Dictionary: remove: Dictionary does not contain key");
-		return(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	}
 	Node* m = search(this->root, k);
 	if(m->left == this->nil){
@@ -322,14 +336,26 @@ void Dictionary::end(){
    // to the next pair (as defined by the order operator < on keys). If 
    // the current iterator is at the last pair, makes current undefined.
    // Pre: hasCurrent()
-void next();
+void Dictionary::next(){
+	if(!hasCurrent()){
+		throw std::invalid_argument("Dictionary: next: current iterator undefined");
+		exit(EXIT_FAILURE);
+	}
+	findNext(this->current);
+}
 
    // prev()
    // If the current iterator is not at the first pair, moves current to  
    // the previous pair (as defined by the order operator < on keys). If 
    // the current iterator is at the first pair, makes current undefined.
    // Pre: hasCurrent()
-void prev();
+void Dictionary::prev(){
+	if(!hasCurrent()){
+		throw std::invalid_argument("Dictionary: prev: current iterator undefined");
+		exit(EXIT_FAILURE);
+	}
+	findPrev(this->current);
+}
 
 
    // Other Functions ---------------------------------------------------------
@@ -339,18 +365,30 @@ void prev();
    // pairs are separated by a newline "\n" character, and the items key and value 
    // are separated by the sequence space-colon-space " : ". The pairs are arranged 
    // in order, as defined by the order operator <.
-std::string to_string() const;
+std::string Dictionary::to_string() const{
+	std::string s;
+	inOrderString(s, this->root);
+	return s;
+}
 
    // pre_string()
    // Returns a string consisting of all keys in this Dictionary. Consecutive
    // keys are separated by newline "\n" characters. The key order is given
    // by a pre-order tree walk.
-std::string pre_string() const;
+std::string Dictionary::pre_string() const{
+	std::string s;
+	preOrderString(s, this->root);
+	return s;
+}
 
    // equals()
    // Returns true if and only if this Dictionary contains the same (key, value)
    // pairs as Dictionary D.
-bool equals(const Dictionary& D) const;
+bool Dictionary::equals(const Dictionary& D) const{
+	std::string T1 = this->pre_string();
+	std::string T2 = D.pre_string();
+	return (T1 == T2);
+}
 
 
    // Overloaded Operators ----------------------------------------------------
@@ -372,10 +410,10 @@ bool operator==( const Dictionary& A, const Dictionary& B ){
    // operator=()
    // Overwrites the state of this Dictionary with state of D, and returns a
    // reference to this Dictionary.
-Dictionary& operator=( const Dictionary& D ){
-	this.clear();
+Dictionary& Dictionary::operator=( const Dictionary& D ){
+	this->clear();
 	Dictionary E = Dictionary(D);
-	this = E;
+	this->preOrderCopy(D.root, nullptr);
 	return *this;
 }
 
