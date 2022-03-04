@@ -67,17 +67,6 @@ void Dictionary::preOrderString(std::string& s, Node* R) const{
 	}
 }
 
-void Dictionary::preOrderStringNoColon(std::string& s, Dictionary& D) const{
-	Node* R = D.root;
-	if(R != this->nil){
-		std::string kv = "";
-		kv += R->key + "\n";
-		s+=kv;
-		preOrderStringNoColon(s, R->left);
-		preOrderStringNoColon(s, R->right);
-	}
-}
-
    // preOrderCopy()
    // Recursively inserts a deep copy of the subtree rooted at R into this 
    // Dictionary. Recursion terminates at N.

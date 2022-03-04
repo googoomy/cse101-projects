@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <algorithm>
 using namespace std;
 
 #include "Dictionary.h"
@@ -41,17 +42,21 @@ int main(int argc,char * argv[]){
 		getline(in, keys[curr]);
 		curr++;
 	}
-	sort(keys, keys + line_count);
+	std::sort(keys, keys + line_count);
 	string curr_str = "";
 	for(int i = 0; i < line_count; i++){
-		curr_str += keys[i] + " : " + to_string(getValue(keys[i])) + "\n";
+		curr_str += keys[i] + " : " + to_string(D.getValue(keys[i])) + "\n";
 		out << curr_str;
 	}
 	out << endl;
 	string str = "";
-	D.preOrderStringNoColon(str, &D.root);
+	str += D.pre_string();
+	string col = " : ";
+	size_t j = col.length();
+	for(size_t k = str.find(col); k != string::npos; k = str.find(col)){
+		str.erase(k, j);
+	}
 	out << str;
-	
 
 
 	in.close();
