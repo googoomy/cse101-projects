@@ -71,7 +71,7 @@ void Dictionary::preOrderString(std::string& s, Node* R) const{
    // Recursively inserts a deep copy of the subtree rooted at R into this 
    // Dictionary. Recursion terminates at N.
 void Dictionary::preOrderCopy(Node* R, Node* N){
-	if(R != this->nil || R == N){
+	if(R != N){
 		this->setValue(R->key, R->val);
 		preOrderCopy(R->left, N);
 		preOrderCopy(R->right, N);
@@ -226,12 +226,12 @@ valType& Dictionary::currentVal() const{
    // clear()
    // Resets this Dictionary to the empty state, containing no pairs.
 void Dictionary::clear(){
-	if(num_pairs != 0 && this->root != this->nil){
+	//if(num_pairs != 0 && this->root != this->nil){
 		postOrderDelete(this->root);
-		this->root = this->nil;
-		this->current = this->nil;
-		num_pairs = 0;
-	}
+		//this->root = this->nil;
+		//this->current = this->nil;
+		//num_pairs = 0;
+	//}
 }
 
    // setValue()
@@ -244,10 +244,13 @@ void Dictionary::setValue(keyType k, valType v){
 	Node* iter = this->root;
 	while(iter != this->nil){
 		curr = iter;
-		if(m->key < m->key){
+		if(m->key < iter->key){
 			iter = iter->left;
-		}else{
+		}else if(m->key > iter->key){
 			iter = iter->right;
+		}else{
+			iter->val = m->val;
+			return;
 		}		
 	}
 	m->parent = curr;
@@ -258,6 +261,8 @@ void Dictionary::setValue(keyType k, valType v){
 	}else{
 		curr->right = m;
 	}
+	m->left = nil;
+	m->right = nil;
 	this->num_pairs++;
 }
 

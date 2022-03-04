@@ -46,8 +46,8 @@ int main(int argc,char * argv[]){
 	string curr_str = "";
 	for(int i = 0; i < line_count; i++){
 		curr_str += keys[i] + " : " + to_string(D.getValue(keys[i])) + "\n";
-		out << curr_str;
 	}
+	out << curr_str;
 	out << endl;
 	string str = "";
 	str += D.pre_string();
@@ -55,6 +55,12 @@ int main(int argc,char * argv[]){
 	size_t j = col.length();
 	for(size_t k = str.find(col); k != string::npos; k = str.find(col)){
 		str.erase(k, j);
+	}
+	for(size_t l = 0; l < str.length(); l++){
+		if(isdigit(str[l])){
+			str.erase(l, 1);
+			l--;
+		}
 	}
 	out << str;
 
