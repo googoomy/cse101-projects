@@ -1,3 +1,8 @@
+// James Gu
+// jjgu
+// pa7
+
+
 #include <iostream>
 #include <fstream>
 #include <string>
