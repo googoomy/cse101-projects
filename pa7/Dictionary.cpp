@@ -1,5 +1,8 @@
 //-----------------------------------------------------------------------------
-// Dictionary.cpp
+// James Gu
+// jjgu
+// pa7
+//Dictionary.cpp
 // Client file for Dictionary ADT based on a Binary Search Tree. Includes a
 // built in iterator called current that can perform a smallest-to-largest
 // (forward) or a largest-to-smallest (reverse) iteration over all keys.
