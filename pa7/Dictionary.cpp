@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 #include <iostream>
 #include <string>
-
+#include<bits/stdc++.h>
 #include "Dictionary.h"
 
 //Node Constructor
@@ -20,18 +20,19 @@ Dictionary::Node::Node(keyType k, valType v){
 
    // Class Constructors & Destructors ----------------------------------------
 Dictionary::Dictionary(){
-	nil = new Node("NIL", -1);
+	nil = new Node("\000", INT_MIN);
 	root = nil;
 	current = nil;
 	num_pairs = 0;
 }
 
 Dictionary::Dictionary(const Dictionary& D){
-	nil = new Node("NIL", -1);
+	nil = new Node("\000", INT_MIN);
 	root = nil;
 	current = nil;
-	num_pairs = D.num_pairs;
+	//num_pairs = D.num_pairs;
 	this->preOrderCopy(D.root, nullptr);
+	num_pairs = D.num_pairs;
 }
 
 Dictionary::~Dictionary(){
@@ -47,7 +48,9 @@ void Dictionary::inOrderString(std::string& s, Node* R) const{
 	if(R != this->nil){
 		inOrderString(s, R->left);
 		std::string kv = "";
-		kv += R->key + " : " + std::to_string(R->val) + " \n";
+		if(R->val > 0){
+			kv += R->key + " : " + std::to_string(R->val) + "\n";
+		}
 		s+=kv;
 		inOrderString(s, R->right);
 	}
@@ -60,7 +63,9 @@ void Dictionary::inOrderString(std::string& s, Node* R) const{
 void Dictionary::preOrderString(std::string& s, Node* R) const{
 	if(R != this->nil){
 		std::string kv = "";
-		kv += R->key + " : " + std::to_string(R->val) + " \n";
+		if(R->val > 0){
+			kv += R->key + " : " + std::to_string(R->val) + "\n";
+		}
 		s+=kv;
 		preOrderString(s, R->left);
 		preOrderString(s, R->right);
@@ -73,6 +78,7 @@ void Dictionary::preOrderString(std::string& s, Node* R) const{
 void Dictionary::preOrderCopy(Node* R, Node* N){
 	if(R != N){
 		this->setValue(R->key, R->val);
+		//this->num_pairs++;
 		preOrderCopy(R->left, N);
 		preOrderCopy(R->right, N);
 	}
@@ -85,6 +91,7 @@ void Dictionary::postOrderDelete(Node* R){
 		postOrderDelete(R->left);
 		postOrderDelete(R->right);
 		delete R;
+		//num_pairs--;
 	}
 
 }
@@ -106,20 +113,26 @@ Dictionary::Node* Dictionary::search(Node* R, keyType k) const{
    // If the subtree rooted at R is not empty, returns a pointer to the 
    // leftmost Node in that subtree, otherwise returns nil.
 Dictionary::Node* Dictionary::findMin(Node* R){
-	while(R->left != this->nil){
-		R = R->left;
+	if(R != this->nil){
+		while(R->left != this->nil){
+			R = R->left;
+		}
+		return R;
 	}
-	return R;
+	return this->nil;
 }
 
    // findMax()
    // If the subtree rooted at R is not empty, returns a pointer to the 
    // rightmost Node in that subtree, otherwise returns nil.
 Dictionary::Node* Dictionary::findMax(Node* R){
-	while(R->right != this->nil){
-		R = R->right;
+	if(R != this->nil){
+		while(R->right != this->nil){
+			R = R->right;
+		}
+		return R;
 	}
-	return R;
+	return this->nil;
 }
 
    // findNext()
@@ -230,7 +243,7 @@ void Dictionary::clear(){
 		postOrderDelete(this->root);
 		//this->root = this->nil;
 		//this->current = this->nil;
-		//num_pairs = 0;
+		num_pairs = 0;
 	//}
 }
 
@@ -304,7 +317,7 @@ void Dictionary::remove(keyType k){
 		min->left = m->left;
 		min->left->parent = min;
 	}
-	
+	num_pairs--;
 }
 
    // begin()
@@ -331,11 +344,16 @@ void Dictionary::end(){
    // the current iterator is at the last pair, makes current undefined.
    // Pre: hasCurrent()
 void Dictionary::next(){
+	/*
 	if(!hasCurrent()){
 		throw std::invalid_argument("Dictionary: next: current iterator undefined");
 		exit(EXIT_FAILURE);
+	}*/
+	if(findNext(current) == this->nil){
+		current = this->nil;
+	}else{
+		current = findNext(this->current);
 	}
-	findNext(this->current);
 }
 
    // prev()
@@ -344,11 +362,16 @@ void Dictionary::next(){
    // the current iterator is at the first pair, makes current undefined.
    // Pre: hasCurrent()
 void Dictionary::prev(){
+	/*
 	if(!hasCurrent()){
 		throw std::invalid_argument("Dictionary: prev: current iterator undefined");
 		exit(EXIT_FAILURE);
+	}*/
+	if(findPrev(current) == this->nil){
+		current = this->nil;
+	}else{
+		current = findPrev(this->current);
 	}
-	findPrev(this->current);
 }
 
 
@@ -360,7 +383,7 @@ void Dictionary::prev(){
    // are separated by the sequence space-colon-space " : ". The pairs are arranged 
    // in order, as defined by the order operator <.
 std::string Dictionary::to_string() const{
-	std::string s;
+	std::string s = "";
 	inOrderString(s, this->root);
 	return s;
 }
@@ -370,7 +393,7 @@ std::string Dictionary::to_string() const{
    // keys are separated by newline "\n" characters. The key order is given
    // by a pre-order tree walk.
 std::string Dictionary::pre_string() const{
-	std::string s;
+	std::string s = "";
 	preOrderString(s, this->root);
 	return s;
 }
@@ -406,8 +429,9 @@ bool operator==( const Dictionary& A, const Dictionary& B ){
    // reference to this Dictionary.
 Dictionary& Dictionary::operator=( const Dictionary& D ){
 	this->clear();
-	Dictionary E = Dictionary(D);
+	//Dictionary E = Dictionary(D);
 	this->preOrderCopy(D.root, nullptr);
+	this->num_pairs = D.num_pairs;	
 	return *this;
 }
 
