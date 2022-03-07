@@ -9,7 +9,7 @@
 //-----------------------------------------------------------------------------
 #include <iostream>
 #include <string>
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 #include "Dictionary.h"
 
 //Node Constructor
