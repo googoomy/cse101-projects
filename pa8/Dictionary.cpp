@@ -215,6 +215,24 @@ Dictionary::Node* Dictionary::findPrev(Node* N){
 	return N;
 }
 
+   // LeftRotate()
+void LeftRotate(Node* N);
+
+   // RightRotate()
+void RightRotate(Node* N);
+
+   // RB_InsertFixUP()
+void RB_InsertFixUp(Node* N);
+
+   // RB_Transplant()
+void RB_Transplant(Node* u, Node* v);
+
+   // RB_DeleteFixUp()
+void RB_DeleteFixUp(Node* N);
+
+   // RB_Delete()
+void RB_Delete(Node* N);
+
 /*
 void deleteKey(Node* N, keyType k){
 	if(N->left == this->nil){
