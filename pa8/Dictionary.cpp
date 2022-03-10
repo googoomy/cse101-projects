@@ -10,6 +10,8 @@
 #include <iostream>
 #include <string>
 #include <bits/stdc++.h>
+#include <stdexcept>
+#include <stack>
 #include "Dictionary.h"
 
 #define RED 0
@@ -19,9 +21,9 @@
 Dictionary::Node::Node(keyType k, valType v){
     key = k;
     val = v;
-    parent = nullptr;
-    left = nullptr;
-    right = nullptr;
+    parent = NULL;
+    left = NULL;
+    right = NULL;
     color = RED;
 };
 
@@ -46,7 +48,7 @@ Dictionary::Dictionary(const Dictionary& D){
 	num_pairs = 0;
 	Dictionary &ref = const_cast <Dictionary &>(D);
 	ref.begin();
-	while(ref.current != this->nil){
+	while(ref.current != ref.nil){
 		setValue(ref.current->key, ref.current->val);
 		ref.next();
 	}
@@ -93,7 +95,7 @@ void Dictionary::preOrderString(std::string& s, Node* R) const{
 		preOrderString(s, R->right);
 	}
 }
-
+/*
    // preOrderCopy()
    // Recursively inserts a deep copy of the subtree rooted at R into this 
    // Dictionary. Recursion terminates at N.
@@ -105,9 +107,10 @@ void Dictionary::preOrderCopy(Node* R, Node* N){
 		preOrderCopy(R->right, N);
 	}
 }
-
+*/
    // postOrderDelete()
    // Deletes all Nodes in the subtree rooted at R, sets R to nil.
+/*
 void Dictionary::postOrderDelete(Node* R){
 	if(R != this->nil){
 		postOrderDelete(R->left);
@@ -117,7 +120,7 @@ void Dictionary::postOrderDelete(Node* R){
 	}
 
 }
-
+*/
    // search()
    // Searches the subtree rooted at R for a Node with key==k. Returns
    // the address of the Node if it exists, returns nil otherwise.
@@ -468,7 +471,10 @@ void Dictionary::clear(){
 		//this->root = this->nil;
 		//this->current = this->nil;
 	nil= new Node("\000", INT_MIN);
-	root=this->nil;
+	nil->left = this->nil;
+	nil->right =this->nil;
+	nil->color = BLACK;
+	root = this->nil;
 	current = this->nil;
 	num_pairs = 0;
 	//}
@@ -697,10 +703,24 @@ bool operator==( const Dictionary& A, const Dictionary& B ){
    // Overwrites the state of this Dictionary with state of D, and returns a
    // reference to this Dictionary.
 Dictionary& Dictionary::operator=( const Dictionary& D ){
+	/*
 	this->clear();
 	//Dictionary E = Dictionary(D);
 	this->preOrderCopy(D.root, nullptr);
 	this->num_pairs = D.num_pairs;	
+	return *this;
+	*/
+	Dictionary &ref = const_cast <Dictionary &>(D);
+	if(this == &D){
+		return *this;
+	}
+	Node* curr = ref.current;
+	ref.begin();
+	while(ref.current != this->nil){
+		setValue(ref.current->key, ref.current->val);
+		ref.next();
+	}
+	ref.current = curr;
 	return *this;
 }
 
